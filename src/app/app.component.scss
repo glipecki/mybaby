@@ -1,0 +1,23 @@
+:host {
+  $bottom-menu-height: 60px;
+  display: flex;
+  flex-direction: column;
+  .content {
+    margin-bottom: $bottom-menu-height;
+  }
+  .app-update {
+    position: fixed;
+    padding: 8px 10px;
+    left: 0;
+    right: 0;
+    bottom: $bottom-menu-height;
+  }
+  bb-bottom-menu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: $bottom-menu-height;
+    overflow: hidden;
+  }
+}

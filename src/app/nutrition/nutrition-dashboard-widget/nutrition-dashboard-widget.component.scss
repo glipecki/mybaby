@@ -1,0 +1,21 @@
+@import 'variables';
+
+:host {
+  display: block;
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: 8px 0;
+    bb-button {
+      margin: 0 4px;
+      width: 100px;
+    }
+  }
+  .action-status {
+    color: $color-success;
+  }
+}
+
+bb-button.recomended {
+  background-color: $color-success;
+}

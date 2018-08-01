@@ -1,0 +1,22 @@
+@import 'variables';
+
+:host {
+  display: block;
+  .body, .header {
+    padding: 8px 16px;
+  }
+  .body {
+    display: flex;
+    background-color: $color-light;
+  }
+  .header {
+    background-color: $color-secondary;
+  }
+  .icon {
+    font-size: 26px;
+    margin-right: 8px;
+  }
+  .content {
+    flex: 1;
+  }
+}
