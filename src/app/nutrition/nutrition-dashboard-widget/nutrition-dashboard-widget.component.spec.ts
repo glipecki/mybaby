@@ -2,7 +2,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {NutritionDashboardWidgetComponent} from './nutrition-dashboard-widget.component';
 
-describe('NutritionDashboardWidgetComponent', () => {
+describe('SleepDashboardWidgetComponent', () => {
   let component: NutritionDashboardWidgetComponent;
   let fixture: ComponentFixture<NutritionDashboardWidgetComponent>;
 

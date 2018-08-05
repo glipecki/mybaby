@@ -2,7 +2,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {PastNutritionsComponent} from './past-nutritions.component';
 
-describe('PastNutritionsComponent', () => {
+describe('PastSleepsComponent', () => {
   let component: PastNutritionsComponent;
   let fixture: ComponentFixture<PastNutritionsComponent>;
 

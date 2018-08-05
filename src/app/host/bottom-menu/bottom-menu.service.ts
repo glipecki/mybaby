@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {faChild} from '@fortawesome/free-solid-svg-icons/faChild';
 import {faUtensils} from '@fortawesome/free-solid-svg-icons/faUtensils';
+import {faMoon} from '@fortawesome/free-solid-svg-icons/faMoon';
 import {Observable, of} from 'rxjs';
 import {RoutingPaths} from '../routing/routing-paths';
 import {BottomMenuItem} from './bottom-menu-item';
@@ -27,6 +28,12 @@ export class BottomMenuService {
         iconType: BottomMenuItemIconType.FAS,
         icon: faUtensils,
         routingPath: RoutingPaths.Nutrition
+      },
+      {
+        title: 'Spanie',
+        iconType: BottomMenuItemIconType.FAS,
+        icon: faMoon,
+        routingPath: RoutingPaths.Sleep
       }
     ]);
   }

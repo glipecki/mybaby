@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {faUtensils} from '@fortawesome/free-solid-svg-icons/faUtensils';
-import {interval} from 'rxjs';
+import {interval, Subscription} from 'rxjs';
 import {TimeSincePipe} from '../../components/time-since/time-since.pipe';
 import {Breast} from '../breast';
 import {Meal} from '../meal';
@@ -10,20 +10,20 @@ import {NutritionService} from '../nutrition.service';
   selector: 'bb-nutrition-dashboard-widget',
   template: `
     <bb-dashboard-widget [header]="'Karmienie'" [icon]="icon">
-      <ng-container *ngIf="lastMeal; else noLastMeal">
-        <div>Od ostatniego karmienia: <em>{{sinceLastMeal}}</em>.</div>
-        <div>Ostatnia pierś: <em>{{lastMeal.breastString}}</em>.</div>
-      </ng-container>
+      <div *ngIf="lastMeal; else lastMealWaiting" class="stats">
+        <div>Od ostatniego karmienia: <em>{{sinceLastMeal}}</em></div>
+        <div>Ostatnia pierś: <em>{{lastMeal.breastsString}}</em></div>
+      </div>
       <div class="actions">
-        <ng-container *ngIf="!actionStatus && !addingMeal">
-          <bb-button (click)="leftBreastClicked()" [class.recomended]="lastMeal?.lastBreastString === Breast.RIGHT">
+        <ng-container *ngIf="!actionStatus && !adding">
+          <bb-button (click)="leftBreastClicked()" [class.recommended]="lastMeal?.lastBreast === Breast.right">
             lewa
           </bb-button>
-          <bb-button (click)="rightBreastClicked()" [class.recomended]="lastMeal?.lastBreastString === Breast.LEFT">
+          <bb-button (click)="rightBreastClicked()" [class.recommended]="lastMeal?.lastBreast === Breast.left">
             prawa
           </bb-button>
         </ng-container>
-        <ng-container *ngIf="addingMeal">
+        <ng-container *ngIf="adding">
           dodawanie...
         </ng-container>
         <div class="action-status" *ngIf="actionStatus">
@@ -31,13 +31,13 @@ import {NutritionService} from '../nutrition.service';
         </div>
       </div>
     </bb-dashboard-widget>
-    <ng-template #noLastMeal>
-      Brak danych ostatniego karmienia
+    <ng-template #lastMealWaiting>
+      ...
     </ng-template>
   `,
   styleUrls: ['./nutrition-dashboard-widget.component.scss']
 })
-export class NutritionDashboardWidgetComponent implements OnInit {
+export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
 
   // noinspection JSUnusedGlobalSymbols - used by template
   Breast = Breast;
@@ -45,42 +45,52 @@ export class NutritionDashboardWidgetComponent implements OnInit {
   lastMeal: Meal;
   sinceLastMeal: string;
   actionStatus: string;
-  addingMeal: boolean;
+  adding: boolean;
+  private timeSinceSubscription: Subscription;
+  private lastMealSubscription: Subscription;
 
   constructor(private service: NutritionService, private timeSince: TimeSincePipe) {
   }
 
   ngOnInit(): void {
-    this.service.getLastMeal().subscribe(
+    this.lastMealSubscription = this.service.getLastMeal().subscribe(
       meal => {
         this.lastMeal = meal;
         this.sinceLastMeal = this.timeSince.transform(this.lastMeal.date);
       }
     );
-    interval(1000).subscribe(
+    this.timeSinceSubscription = interval(1000).subscribe(
       () => this.sinceLastMeal = this.lastMeal ? this.timeSince.transform(this.lastMeal.date) : undefined
     )
-
   }
 
   leftBreastClicked() {
-    this.addingMeal = true;
-    this.service.addMeal(Breast.LEFT).subscribe(
+    this.adding = true;
+    this.service.addMeal(Breast.left).subscribe(
       () => {
         this.flashActionStatus('dodano!', 1000)
-        this.addingMeal = false;
+        this.adding = false;
       }
     );
   }
 
   rightBreastClicked() {
-    this.addingMeal = true;
-    this.service.addMeal(Breast.RIGHT).subscribe(
+    this.adding = true;
+    this.service.addMeal(Breast.right).subscribe(
       () => {
         this.flashActionStatus('dodano!', 1000)
-        this.addingMeal = false;
+        this.adding = false;
       }
     );
+  }
+
+  ngOnDestroy(): void {
+    if (this.timeSinceSubscription) {
+      this.timeSinceSubscription.unsubscribe();
+    }
+    if (this.lastMealSubscription) {
+      this.lastMealSubscription.unsubscribe();
+    }
   }
 
   private flashActionStatus(message: string, timeout: number) {

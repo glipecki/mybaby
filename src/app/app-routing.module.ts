@@ -1,5 +1,6 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+import {PastSleepsComponent} from 'src/app/sleep/past-sleeps/past-sleeps.component';
 import {UserAuthenticatedGuard} from './common/auth/user-authenticated.guard';
 import {DashboardComponent} from './host/dashboard/dashboard.component';
 import {LoginComponent} from './host/login/login.component';
@@ -20,6 +21,11 @@ const routes: Routes = [
   {
     path: 'nutrition',
     component: PastNutritionsComponent,
+    canActivate: [UserAuthenticatedGuard]
+  },
+  {
+    path: 'sleep',
+    component: PastSleepsComponent,
     canActivate: [UserAuthenticatedGuard]
   },
   {

@@ -3,4 +3,7 @@
 :host {
   display: block;
   padding: 15px;
+  & > * {
+    margin-bottom: 16px;
+  }
 }

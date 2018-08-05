@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import * as firebase from 'firebase';
-import * as moment from 'moment';
+import moment from 'moment';
 import {Observable, Subject} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
-import {map} from 'rxjs/operators';
+import {flatMap, map} from 'rxjs/operators';
 import {Breast} from 'src/app/nutrition/breast';
+import {BreastDb} from 'src/app/nutrition/breast-db';
 import {AuthService} from '../common/auth/auth.service';
 import {FirebaseService} from '../firebase/firebase.service';
 import {Meal} from './meal';
@@ -53,19 +54,57 @@ export class NutritionService {
   }
 
   addMeal(brest: Breast): Observable<Meal> {
-    const doc: MealDb = {
-      userId: this.authService.getUserWrapper().user.uid,
-      breasts: [brest],
-      date: moment().valueOf()
+    const timestamp: number = moment().valueOf();
+    const date: string = moment(timestamp).format(NutritionService.DATE_FORMAT);
+    const mealBreast: BreastDb = {
+      breast: brest,
+      timestamp: timestamp,
+      date: date
     };
     return fromPromise(
-      this.firebaseService.getApp()
-        .firestore()
-        .collection('meals')
-        .add(doc)
+      this.meals.limit(1).get()
     ).pipe(
-      map(() => this.mealDbToMeal(doc))
+      map(queryResult => {
+        if (queryResult && queryResult.size === 1) {
+          return {
+            docSnapshot: queryResult.docs[0],
+            mealDb: queryResult.docs[0].data() as MealDb
+          };
+        } else {
+          return undefined;
+        }
+      }),
+      flatMap(queryResult => {
+        if (queryResult && this.elapsedMinutes(queryResult) <= 30) {
+          const newBreasts: BreastDb[] = [...queryResult.mealDb.breasts, mealBreast];
+          return fromPromise(
+            queryResult.docSnapshot.ref.update('breasts', newBreasts)
+          ).pipe(
+            map(() => queryResult.docSnapshot.ref)
+          );
+        } else {
+          const meal: MealDb = {
+            userId: this.authService.getUserWrapper().user.uid,
+            babyId: 'oezcGwNonYiNDsYQ6B8g',
+            breasts: [mealBreast],
+            timestamp: moment().valueOf(),
+            date: date
+          };
+          return fromPromise(
+            this.firebaseService.getApp()
+              .firestore()
+              .collection('meals')
+              .add(meal)
+          );
+        }
+      }),
+      flatMap(docRef => fromPromise(docRef.get())),
+      map(doc => this.mealDbToMeal(doc.data() as MealDb))
     );
+  }
+
+  private elapsedMinutes(queryResult) {
+    return moment.duration(moment().diff(moment(queryResult.mealDb.date))).asMinutes();
   }
 
   getMeals(): Observable<Meal[]> {
@@ -80,20 +119,23 @@ export class NutritionService {
 
   private mealDbToMeal(db: MealDb): Meal {
     const breastToString: (breast: Breast) => string = breast => {
-      if (breast === Breast.LEFT) {
+      if (breast === Breast.left) {
         return 'lewa';
-      } else if (breast === Breast.RIGHT) {
+      } else if (breast === Breast.right) {
         return 'prawa';
       } else {
         return 'n/a';
       }
     };
-    let breasts = db.breasts.map(breast => breast === 'left' ? Breast.LEFT : Breast.RIGHT);
+    let breasts = db.breasts
+      .map(breast => breast.breast)
+      .map(breast => Breast[breast]);
     return {
       breasts,
-      date: moment(db.date).format(NutritionService.DATE_FORMAT),
+      date: db.date,
       lastBreastString: breastToString(breasts[breasts.length - 1]),
-      breastString: breasts.map(breastToString).join('+')
+      lastBreast: breasts[breasts.length - 1],
+      breastsString: breasts.map(breastToString).join('+')
     };
   }
 

@@ -22,7 +22,6 @@ export class AppComponent {
     if (swUpdate.isEnabled) {
       swUpdate.available.subscribe(
         update => {
-          console.log(update);
           this.appUpdate = {}
         }
       );

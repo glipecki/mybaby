@@ -1,4 +1,4 @@
 export enum Breast {
-  LEFT = 'left',
-  RIGHT = 'right'
+  left = 'left',
+  right = 'right'
 }

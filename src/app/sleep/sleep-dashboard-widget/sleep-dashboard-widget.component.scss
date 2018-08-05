@@ -14,12 +14,12 @@
       margin: 0 4px;
       width: 100px;
     }
+    .input-wrapper {
+      flex: 1;
+      display: flex;
+    }
   }
   .action-status {
     color: $color-success;
   }
-}
-
-bb-button.recommended {
-  background-color: $color-success;
 }
