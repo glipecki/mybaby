@@ -2,6 +2,7 @@ import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {DateTimePickerComponent} from 'src/app/components/date-time-picker/date-time-picker.component';
+import {ListWithDayGroupingComponent} from 'src/app/components/list-with-day-groupping/list-with-day-grouping.component';
 import {OperationWithConfirmComponent} from 'src/app/components/operation-with-confirm/operation-with-confirm.component';
 import {PastSleepsComponent} from 'src/app/sleep/past-sleeps/past-sleeps.component';
 import {SleepDashboardWidgetComponent} from 'src/app/sleep/sleep-dashboard-widget/sleep-dashboard-widget.component';
@@ -46,7 +47,8 @@ import { environment } from '../environments/environment';
     SleepWidgetSummarySleepingComponent,
     SleepWidgetSummaryActiveComponent,
     SleepWidgetSleepChangeComponent,
-    PastSleepsComponent
+    PastSleepsComponent,
+    ListWithDayGroupingComponent
   ],
   imports: [
     BrowserModule,

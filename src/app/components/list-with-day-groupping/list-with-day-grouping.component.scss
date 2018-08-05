@@ -1,0 +1,21 @@
+@import 'variables';
+
+:host {
+  .day-group {
+    margin-bottom: 30px;
+  }
+  .header {
+    background-color: $color-gray-700;
+    padding: 8px 16px;
+  }
+  .body {
+    background-color: $color-gray-800;
+    padding: 8px 16px;
+  }
+  .row {
+    display: flex;
+  }
+  .row-index {
+    width: 30px;
+  }
+}
