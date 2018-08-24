@@ -1,7 +1,7 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {faMoon} from '@fortawesome/free-solid-svg-icons/faMoon';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {faBed} from '@fortawesome/free-solid-svg-icons/faBed';
 import {faVolleyballBall} from '@fortawesome/free-solid-svg-icons/faVolleyballBall';
-import {TimeSincePipe} from 'src/app/components/time-since/time-since.pipe';
+import {DashboardWidgetComponent} from 'src/app/components/dashboard-widget/dashboard-widget.component';
 import {Sleep} from 'src/app/sleep/sleep';
 import {SleepDateSelected} from 'src/app/sleep/sleep-dashboard-widget/sleep-widget-sleep-change/sleep-date-selected';
 import {SleepService} from 'src/app/sleep/sleep.service';
@@ -9,7 +9,7 @@ import {SleepService} from 'src/app/sleep/sleep.service';
 @Component({
   selector: 'bb-sleep-dashboard-widget',
   template: `
-    <bb-dashboard-widget [header]="'Spanie'" [icon]="icon">
+    <bb-dashboard-widget [header]="'Spanie'" [icon]="icon" [hasExpandableContent]="true">
       <div class="summary" *ngIf="lastSleep; else lastSleepLoading">
         <bb-sleep-widget-summary-active *ngIf="isActive()"
                                         [sleep]="lastSleep">
@@ -36,6 +36,14 @@ import {SleepService} from 'src/app/sleep/sleep.service';
           {{status}}
         </div>
       </div>
+      <ng-container expandable-content>
+        <ng-container *ngIf="isActive()">
+          <bb-button (click)="resumeLastSleep()">wznów drzemkę</bb-button>
+        </ng-container>
+        <ng-container *ngIf="isSleeping()">
+          <bb-button (click)="cancelLastSleep()">odwołaj drzemkę</bb-button>
+        </ng-container>
+      </ng-container>
     </bb-dashboard-widget>
     <ng-template #lastSleepLoading>
       ...
@@ -47,8 +55,10 @@ export class SleepDashboardWidgetComponent implements OnInit, OnDestroy {
 
   inProgress = false;
   status: string = undefined;
-  icon = faMoon;
+  icon = faBed;
   lastSleep: Sleep;
+
+  @ViewChild(DashboardWidgetComponent) private widget: DashboardWidgetComponent;
 
   constructor(private service: SleepService) {
   }
@@ -57,7 +67,7 @@ export class SleepDashboardWidgetComponent implements OnInit, OnDestroy {
     this.service.getLastSleep().subscribe(
       sleep => {
         this.lastSleep = sleep;
-        this.icon = this.isActive() ? faVolleyballBall : faMoon;
+        this.icon = this.isActive() ? faVolleyballBall : faBed;
       }
     );
   }
@@ -86,6 +96,28 @@ export class SleepDashboardWidgetComponent implements OnInit, OnDestroy {
   endDateSelected($event: SleepDateSelected) {
     this.inProgress = true;
     this.service.endSleep($event.date, $event.time).subscribe(
+      sleep => {
+        this.inProgress = false;
+        this.flashStatusMessage('Zapisano');
+      }
+    );
+  }
+
+  resumeLastSleep() {
+    this.widget.hideExpandableContent();
+    this.inProgress = true;
+    this.service.resumeLastSleep().subscribe(
+      sleep => {
+        this.inProgress = false;
+        this.flashStatusMessage('Zapisano');
+      }
+    );
+  }
+
+  cancelLastSleep() {
+    this.widget.hideExpandableContent();
+    this.inProgress = true;
+    this.service.cancelLastSleep().subscribe(
       sleep => {
         this.inProgress = false;
         this.flashStatusMessage('Zapisano');

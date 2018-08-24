@@ -1,0 +1,35 @@
+@import 'variables';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid $color-gray-700;
+  padding-bottom: 12px;
+  .header {
+    display: flex;
+    align-items: center;
+    fa-icon {
+      font-size: 20px;
+    }
+  }
+  .name {
+    font-size: 20px;
+    flex: 1;
+  }
+  .details {
+    margin-top: 5px;
+    overflow: hidden;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    &:not(:last-of-type) {
+      margin-bottom: 3px;
+    }
+    .icon {
+      width: 25px;
+      text-align: right;
+      margin-right: 10px;
+    }
+  }
+}

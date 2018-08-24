@@ -8,21 +8,17 @@ export class TimeSincePipe implements PipeTransform {
 
   transform(value: any, args?: any): any {
     const duration = moment.duration(moment().diff(moment(value)));
-    return this.asLocalizedText(duration);
-  }
-
-  asLocalizedText(duration: moment.Duration) {
-    if (duration.hours() > 0) {
-      return `${duration.hours()} godzin i ${duration.minutes()} minut`;
-    } else {
-      return `${duration.minutes()} minut`;
+    const parts = [];
+    if (duration.years() > 0) {
+      parts.push(`${duration.years()} lat`)
     }
-  }
-
-  asTime(duration: moment.Duration) {
-    const hours = duration.hours() > 9 ? duration.hours() : `0${duration.hours()}`;
-    const minutes = duration.minutes() > 9 ? duration.minutes() : `0${duration.minutes()}`;
-    return `${hours}:${minutes}`;
+    if (duration.months() > 0) {
+      parts.push(`${duration.months()} miesięcy`)
+    }
+    if (duration.days() > 0) {
+      parts.push(`${duration.days()} dni`)
+    }
+    return parts.join(' i ');
   }
 
 }

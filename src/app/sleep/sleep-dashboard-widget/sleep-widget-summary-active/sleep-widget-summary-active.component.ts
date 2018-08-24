@@ -1,6 +1,6 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {interval, Subscription} from 'rxjs';
-import {TimeSincePipe} from 'src/app/components/time-since/time-since.pipe';
+import {HoursSincePipe} from 'src/app/components/hours-since/hours-since.pipe';
 import {Sleep} from 'src/app/sleep/sleep';
 
 @Component({
@@ -17,21 +17,21 @@ export class SleepWidgetSummaryActiveComponent implements OnInit, OnDestroy {
 
   @Input() sleep: Sleep;
   sinceLastSleep: string;
-  private timeSinceSubscription: Subscription;
+  private hoursSinceSubscription: Subscription;
 
-  constructor(private timeSince: TimeSincePipe) {
+  constructor(private hoursSince: HoursSincePipe) {
   }
 
   ngOnInit(): void {
-    this.sinceLastSleep = this.timeSince.transform(this.sleep.end);
-    this.timeSinceSubscription = interval(1000).subscribe(
-      () => this.sinceLastSleep = this.timeSince.transform(this.sleep.end)
+    this.sinceLastSleep = this.hoursSince.transform(this.sleep.end);
+    this.hoursSinceSubscription = interval(1000).subscribe(
+      () => this.sinceLastSleep = this.hoursSince.transform(this.sleep.end)
     );
   }
 
   ngOnDestroy(): void {
-    if (this.timeSinceSubscription) {
-      this.timeSinceSubscription.unsubscribe();
+    if (this.hoursSinceSubscription) {
+      this.hoursSinceSubscription.unsubscribe();
     }
   }
 

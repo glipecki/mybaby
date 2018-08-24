@@ -1,5 +1,5 @@
 export interface SleepDb {
-  type?: 'day'|'night';
+  type: 'day'|'night'|'current';
   babyId: string;
   userId: string;
   start: {

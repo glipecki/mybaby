@@ -1,10 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {faUtensils} from '@fortawesome/free-solid-svg-icons/faUtensils';
 import {interval, Subscription} from 'rxjs';
-import {TimeSincePipe} from '../../components/time-since/time-since.pipe';
-import {Breast} from '../breast';
-import {Meal} from '../meal';
-import {NutritionService} from '../nutrition.service';
+import {HoursSincePipe} from 'src/app/components/hours-since/hours-since.pipe';
+import {Breast} from 'src/app/nutrition/breast'
+import {Meal} from 'src/app/nutrition/meal';
+import {NutritionService} from 'src/app/nutrition/nutrition.service';
 
 @Component({
   selector: 'bb-nutrition-dashboard-widget',
@@ -16,10 +16,10 @@ import {NutritionService} from '../nutrition.service';
       </div>
       <div class="actions">
         <ng-container *ngIf="!actionStatus && !adding">
-          <bb-button (click)="leftBreastClicked()" [class.recommended]="lastMeal?.lastBreast === Breast.right">
+          <bb-button (click)="leftBreastClicked()" [class.recommended]="recommendedBreast === Breast.left">
             lewa
           </bb-button>
-          <bb-button (click)="rightBreastClicked()" [class.recommended]="lastMeal?.lastBreast === Breast.left">
+          <bb-button (click)="rightBreastClicked()" [class.recommended]="recommendedBreast === Breast.right">
             prawa
           </bb-button>
         </ng-container>
@@ -46,21 +46,23 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
   sinceLastMeal: string;
   actionStatus: string;
   adding: boolean;
-  private timeSinceSubscription: Subscription;
+  recommendedBreast: Breast;
+  private hoursSinceSubscription: Subscription;
   private lastMealSubscription: Subscription;
 
-  constructor(private service: NutritionService, private timeSince: TimeSincePipe) {
+  constructor(private service: NutritionService, private hoursSince: HoursSincePipe) {
   }
 
   ngOnInit(): void {
     this.lastMealSubscription = this.service.getLastMeal().subscribe(
       meal => {
         this.lastMeal = meal;
-        this.sinceLastMeal = this.timeSince.transform(this.lastMeal.date);
+        this.sinceLastMeal = this.hoursSince.transform(this.lastMeal.date);
+        this.recommendedBreast = this.getRecommendedBreast(this.lastMeal.breasts);
       }
     );
-    this.timeSinceSubscription = interval(1000).subscribe(
-      () => this.sinceLastMeal = this.lastMeal ? this.timeSince.transform(this.lastMeal.date) : undefined
+    this.hoursSinceSubscription = interval(1000).subscribe(
+      () => this.sinceLastMeal = this.lastMeal ? this.hoursSince.transform(this.lastMeal.date) : undefined
     )
   }
 
@@ -85,8 +87,8 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.timeSinceSubscription) {
-      this.timeSinceSubscription.unsubscribe();
+    if (this.hoursSinceSubscription) {
+      this.hoursSinceSubscription.unsubscribe();
     }
     if (this.lastMealSubscription) {
       this.lastMealSubscription.unsubscribe();
@@ -100,4 +102,13 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
       timeout
     );
   }
+
+  private getRecommendedBreast(breasts: Breast[]): Breast {
+    if (breasts.length === 1) {
+      return breasts[0] === Breast.left ? Breast.right : Breast.left;
+    } else {
+      return breasts[breasts.length - 1];
+    }
+  }
+
 }

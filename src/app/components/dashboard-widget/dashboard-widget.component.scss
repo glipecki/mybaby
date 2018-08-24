@@ -2,7 +2,7 @@
 
 :host {
   display: block;
-  .body, .header {
+  .body, .header, .expandable-content .expandable-content-content {
     padding: 8px 16px;
   }
   .body {
@@ -11,6 +11,10 @@
   }
   .header {
     background-color: $color-secondary;
+    display: flex;
+    .text {
+      flex: 1;
+    }
   }
   .icon {
     font-size: 26px;
@@ -19,5 +23,13 @@
   }
   .content {
     flex: 1;
+  }
+  .expand {
+    width: 16px;
+  }
+  .expandable-content {
+    overflow: hidden;
+    background-color: $color-light;
+    margin-top: -16px;
   }
 }

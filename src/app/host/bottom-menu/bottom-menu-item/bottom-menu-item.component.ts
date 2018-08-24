@@ -12,7 +12,6 @@ import {BottomMenuItemIconType} from '../bottom-menu-item-icon-type';
           <fa-icon [icon]="item.icon"></fa-icon>
         </ng-container>
       </div>
-      <div class="header" *ngIf="item.title">{{item.title}}</div>
     </div>
   `,
   styleUrls: ['./bottom-menu-item.component.scss']

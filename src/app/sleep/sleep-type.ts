@@ -1,4 +1,5 @@
 export enum SleepType {
   day = 'day',
-  night = 'night'
+  night = 'night',
+  current = 'current'
 }

@@ -19,11 +19,33 @@
     width: 20px;
     margin-right: 5px;
   }
-  .stats {
-    font-style: italic;
-  }
-  .sleep-row {
+  .row {
     display: flex;
+    flex-direction: row;
+    margin-bottom: 3px;
+  }
+  .row {
+    .column:nth-child(1) {
+      flex: 1;
+    }
+    .column:nth-child(2) {
+      width: 35px;
+      text-align: center;
+    }
+    .column:nth-child(3), .column:nth-child(4) {
+      width: 50px;
+      text-align: center;
+    }
+  }
+  .stats {
+    display: flex;
+    text-align: right;
+    & > div {
+      flex: 1;
+    }
+    & > div:first-of-type {
+      margin-right: 5px;
+    }
   }
 }
 

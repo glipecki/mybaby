@@ -1,14 +1,15 @@
 import {Injectable} from '@angular/core';
 import * as firebase from 'firebase';
 import moment, {duration} from 'moment';
-import {Observable, Subject} from 'rxjs';
+import {Observable, of, Subject, timer} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {flatMap, map} from 'rxjs/operators';
 import {AuthService} from 'src/app/common/auth/auth.service';
-import {TimeSincePipe} from 'src/app/components/time-since/time-since.pipe';
+import {HoursSincePipe} from 'src/app/components/hours-since/hours-since.pipe';
 import {FirebaseService} from 'src/app/firebase/firebase.service';
 import {Sleep} from 'src/app/sleep/sleep';
 import {SleepDb} from 'src/app/sleep/sleep-db';
+import {SleepType} from 'src/app/sleep/sleep-type';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ export class SleepService {
   constructor(
     private firebaseService: FirebaseService,
     private authService: AuthService,
-    private timeSince: TimeSincePipe) {
+    private hoursSince: HoursSincePipe) {
     this.sleeps = this.firebaseService.getApp()
       .firestore()
       .collection('sleeps')
@@ -72,6 +73,7 @@ export class SleepService {
         const sleepDb: SleepDb = {
           babyId: 'oezcGwNonYiNDsYQ6B8g',
           userId: this.authService.getUserWrapper().user.uid,
+          type: SleepType.current,
           start: {
             date: startDate.format('YYYY-MM-DD HH:mm'),
             timestamp: startDate.valueOf()
@@ -81,7 +83,7 @@ export class SleepService {
           const activityStart = moment(queryResult.sleepDb.end.date);
           const activityDuration = duration(startDate.diff(activityStart));
           sleepDb.activityBefore = {
-            text: this.timeSince.asTime(activityDuration),
+            text: this.hoursSince.asTime(activityDuration),
             time: activityDuration.asSeconds()
           };
         }
@@ -111,14 +113,16 @@ export class SleepService {
       flatMap(sleep => {
         const sleepStart = moment((sleep.data() as SleepDb).start.date);
         const sleepDuration = duration(endDate.diff(sleepStart));
+        const longSleepAtNightTime = sleepStart.hours() >= 19 && sleepDuration.asHours() >= 4;
         return fromPromise(
           sleep.ref.update(<Partial<SleepDb>>{
+            type: longSleepAtNightTime ? SleepType.night : SleepType.day,
             end: {
               date: endDate.format('YYYY-MM-DD HH:mm'),
               timestamp: endDate.valueOf()
             },
             sleep: {
-              text: this.timeSince.asTime(sleepDuration),
+              text: this.hoursSince.asTime(sleepDuration),
               time: sleepDuration.asSeconds()
             }
           })
@@ -131,9 +135,21 @@ export class SleepService {
     );
   }
 
+  resumeLastSleep(): Observable<Sleep> {
+    return timer(3000).pipe(
+      map(() => null)
+    );
+  }
+
+  cancelLastSleep(): Observable<Sleep> {
+    return timer(3000).pipe(
+      map(() => null)
+    );
+  }
+
   private sleepDbToSleep(db: SleepDb): Sleep {
     return {
-      type: undefined,
+      type: SleepType[db.type],
       typeString: undefined,
       start: db.start.date,
       startHour: moment(db.start.date).format('HH:mm'),

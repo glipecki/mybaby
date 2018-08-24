@@ -1,11 +1,6 @@
 import {Component, ContentChild, Input, OnChanges, SimpleChanges, TemplateRef} from '@angular/core';
 import moment, {Moment} from 'moment';
-
-interface GroupedRow<T> {
-  date: Moment;
-  dateString: string;
-  rows: T[];
-}
+import {GroupedRow} from 'src/app/components/list-with-day-groupping/grouped-row';
 
 @Component({
   selector: 'bb-list-with-day-grouping',
@@ -15,6 +10,12 @@ interface GroupedRow<T> {
         <ng-container *ngTemplateOutlet="headerTemplate; context: {$implicit: day}"></ng-container>
       </div>
       <div class="body">
+        <div class="row" *ngIf="rowsHeaderTemplate">
+          <div class="row-index">&nbsp;</div>
+          <div class="row-body">
+            <ng-container *ngTemplateOutlet="rowsHeaderTemplate"></ng-container>
+          </div>
+        </div>
         <div *ngFor="let row of day.rows; let index = index" class="row">
           <div class="row-index" *ngIf="rowIndexing">
             {{day.rows.length - index}}.
@@ -35,6 +36,7 @@ export class ListWithDayGroupingComponent<T> implements OnChanges {
   @Input() dateExtractor: (row: T) => Moment;
 
   @ContentChild('header') headerTemplate: TemplateRef<any>;
+  @ContentChild('rowsHeader') rowsHeaderTemplate: TemplateRef<any>;
   @ContentChild('row') rowTemplate: TemplateRef<any>;
 
   grouped: GroupedRow<T>[];
