@@ -13,7 +13,7 @@ import {SleepService} from 'src/app/sleep/sleep.service';
 @Component({
   selector: 'bb-past-sleeps',
   template: `
-    <bb-list-with-day-grouping [data]="sleeps|async"
+    <bb-list-with-day-grouping [data]="sleeps$|async"
                                [dateExtractor]="sleepDateExtractor">
       <ng-template #header let-day>
         <div>{{day.dateString}}</div>
@@ -47,7 +47,7 @@ import {SleepService} from 'src/app/sleep/sleep.service';
             <fa-icon [icon]="iconBasedOnSleepType(row)"></fa-icon>
           </div>
           <div class="column">{{row.sleep?.text || '...'}}</div>
-          <div class="column">{{row.activityBefore?.text  || '...'}}</div>
+          <div class="column">{{row.activityBefore?.text || '...'}}</div>
         </div>
       </ng-template>
     </bb-list-with-day-grouping>
@@ -60,14 +60,14 @@ export class PastSleepsComponent implements OnInit {
   readonly faBed = faBed;
   // noinspection JSUnusedGlobalSymbols - used by template
   readonly faVolleyballBall = faVolleyballBall;
-  sleeps: Observable<Sleep[]>;
+  sleeps$: Observable<Sleep[]>;
   sleepDateExtractor = (sleep: Sleep) => moment(sleep.start);
 
   constructor(private sleepService: SleepService) {
   }
 
   ngOnInit() {
-    this.sleeps = this.sleepService.getSleeps();
+    this.sleeps$ = this.sleepService.sleeps$();
   }
 
   iconBasedOnSleepType(row: Sleep) {

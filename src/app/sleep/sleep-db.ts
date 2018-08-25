@@ -1,7 +1,6 @@
 export interface SleepDb {
   type: 'day'|'night'|'current';
   babyId: string;
-  userId: string;
   start: {
     date: string;
     timestamp: number;

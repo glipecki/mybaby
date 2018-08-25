@@ -1,6 +1,7 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {faBed} from '@fortawesome/free-solid-svg-icons/faBed';
 import {faVolleyballBall} from '@fortawesome/free-solid-svg-icons/faVolleyballBall';
+import moment from 'moment';
 import {DashboardWidgetComponent} from 'src/app/components/dashboard-widget/dashboard-widget.component';
 import {Sleep} from 'src/app/sleep/sleep';
 import {SleepDateSelected} from 'src/app/sleep/sleep-dashboard-widget/sleep-widget-sleep-change/sleep-date-selected';
@@ -51,7 +52,7 @@ import {SleepService} from 'src/app/sleep/sleep.service';
   `,
   styleUrls: ['./sleep-dashboard-widget.component.scss']
 })
-export class SleepDashboardWidgetComponent implements OnInit, OnDestroy {
+export class SleepDashboardWidgetComponent implements OnInit {
 
   inProgress = false;
   status: string = undefined;
@@ -64,15 +65,12 @@ export class SleepDashboardWidgetComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.service.getLastSleep().subscribe(
+    this.service.lastSleep$().subscribe(
       sleep => {
         this.lastSleep = sleep;
         this.icon = this.isActive() ? faVolleyballBall : faBed;
       }
     );
-  }
-
-  ngOnDestroy(): void {
   }
 
   isActive(): boolean {
@@ -83,46 +81,34 @@ export class SleepDashboardWidgetComponent implements OnInit, OnDestroy {
     return this.lastSleep && this.lastSleep.end === undefined;
   }
 
-  startDateSelected($event: SleepDateSelected) {
+  async startDateSelected($event: SleepDateSelected) {
     this.inProgress = true;
-    this.service.startSleep($event.date, $event.time).subscribe(
-      sleep => {
-        this.inProgress = false;
-        this.flashStatusMessage('Zapisano');
-      }
-    );
+    await this.service.start(moment(`${$event.date} ${$event.time}`));
+    this.inProgress = false;
+    this.flashStatusMessage('Zapisano');
   }
 
-  endDateSelected($event: SleepDateSelected) {
+  async endDateSelected($event: SleepDateSelected) {
     this.inProgress = true;
-    this.service.endSleep($event.date, $event.time).subscribe(
-      sleep => {
-        this.inProgress = false;
-        this.flashStatusMessage('Zapisano');
-      }
-    );
+    await this.service.end(this.lastSleep.id, moment(`${$event.date} ${$event.time}`));
+    this.inProgress = false;
+    this.flashStatusMessage('Zapisano');
   }
 
-  resumeLastSleep() {
+  async resumeLastSleep() {
     this.widget.hideExpandableContent();
     this.inProgress = true;
-    this.service.resumeLastSleep().subscribe(
-      sleep => {
-        this.inProgress = false;
-        this.flashStatusMessage('Zapisano');
-      }
-    );
+    await this.service.resume(this.lastSleep.id);
+    this.inProgress = false;
+    this.flashStatusMessage('Zapisano');
   }
 
-  cancelLastSleep() {
+  async cancelLastSleep() {
     this.widget.hideExpandableContent();
     this.inProgress = true;
-    this.service.cancelLastSleep().subscribe(
-      sleep => {
-        this.inProgress = false;
-        this.flashStatusMessage('Zapisano');
-      }
-    );
+    await this.service.cancel(this.lastSleep.id);
+    this.inProgress = false;
+    this.flashStatusMessage('Zapisano');
   }
 
   private flashStatusMessage(message: string) {

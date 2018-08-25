@@ -1,169 +1,135 @@
 import {Injectable} from '@angular/core';
+import {Optional} from '@glipecki/optional';
 import * as firebase from 'firebase';
 import moment, {duration} from 'moment';
-import {Observable, of, Subject, timer} from 'rxjs';
-import {fromPromise} from 'rxjs/internal-compatibility';
-import {flatMap, map} from 'rxjs/operators';
-import {AuthService} from 'src/app/common/auth/auth.service';
+import {Observable, Subject} from 'rxjs';
 import {HoursSincePipe} from 'src/app/components/hours-since/hours-since.pipe';
 import {FirebaseService} from 'src/app/firebase/firebase.service';
 import {Sleep} from 'src/app/sleep/sleep';
 import {SleepDb} from 'src/app/sleep/sleep-db';
 import {SleepType} from 'src/app/sleep/sleep-type';
+import {CurrentBabyService} from '../common/baby/current-baby.service';
+import {SleepDbMapper} from './sleep-db-mapper';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SleepService {
 
-  private readonly sleeps: firebase.firestore.Query;
+  private static readonly DATE_FORMAT = 'YYYY-MM-DD HH:mm';
+  private readonly sleepCollection: firebase.firestore.CollectionReference;
 
   constructor(
-    private firebaseService: FirebaseService,
-    private authService: AuthService,
-    private hoursSince: HoursSincePipe) {
-    this.sleeps = this.firebaseService.getApp()
+    firebaseService: FirebaseService,
+    private currentBaby: CurrentBabyService,
+    private hoursSince: HoursSincePipe,
+    private sleepDbMapper: SleepDbMapper) {
+    this.sleepCollection = firebaseService.getApp()
       .firestore()
-      .collection('sleeps')
-      .where('userId', '==', this.authService.getUserWrapper().user.uid)
-      .orderBy('start.date', 'desc');
+      .collection('sleeps');
   }
 
-  getLastSleep(): Observable<Sleep> {
+  lastSleep$(): Observable<Sleep> {
     const subject = new Subject<Sleep>();
-    this.sleeps
-      .limit(1)
-      .onSnapshot(
-        snapshot => {
-          if (snapshot.docs.length > 0) {
-            subject.next(this.sleepDbToSleep(snapshot.docs[0].data() as SleepDb))
-          }
-        }
-      );
-    return subject.asObservable();
-  }
-
-  getSleeps(): Observable<Sleep[]> {
-    const subject = new Subject<Sleep[]>();
-    this.sleeps.onSnapshot(
+    this.sleepQuery().limit(1).onSnapshot(
       snapshot => {
-        subject.next(snapshot.docs.map(doc => this.sleepDbToSleep(doc.data() as SleepDb)));
+        if (snapshot.docs.length > 0) {
+          subject.next(this.sleepDbMapper.fromDocumentSnapshot(snapshot.docs[0]))
+        }
       }
     );
     return subject.asObservable();
   }
 
-  startSleep(date: string, time: string): Observable<Sleep> {
-    // TODO: jeżeli sen szybciej niż po X minutach to odwołaj datę end poprzedniego (z potwierdzeniem?
-    const startDate = moment(`${date} ${time}`);
-    return fromPromise(
-      this.sleeps.limit(1).get()
-    ).pipe(
-      map(queryResult => {
-        if (queryResult && queryResult.size === 1) {
-          return {
-            docSnapshot: queryResult.docs[0],
-            sleepDb: queryResult.docs[0].data() as SleepDb
-          }
-        } else {
-          return undefined;
-        }
-      }),
-      map((queryResult): SleepDb => {
-        const sleepDb: SleepDb = {
-          babyId: 'oezcGwNonYiNDsYQ6B8g',
-          userId: this.authService.getUserWrapper().user.uid,
-          type: SleepType.current,
-          start: {
-            date: startDate.format('YYYY-MM-DD HH:mm'),
-            timestamp: startDate.valueOf()
-          },
-        };
-        if (queryResult && queryResult.sleepDb.end) {
-          const activityStart = moment(queryResult.sleepDb.end.date);
-          const activityDuration = duration(startDate.diff(activityStart));
-          sleepDb.activityBefore = {
-            text: this.hoursSince.asTime(activityDuration),
-            time: activityDuration.asSeconds()
-          };
-        }
-        return sleepDb;
-      }),
-      flatMap(sleepDb => fromPromise(
-        this.firebaseService.getApp()
-          .firestore()
-          .collection('sleeps')
-          .add(sleepDb)
-      )),
-      flatMap(docRef => fromPromise(docRef.get())),
-      map(doc => this.sleepDbToSleep(doc.data() as SleepDb))
+  sleeps$(): Observable<Sleep[]> {
+    const subject = new Subject<Sleep[]>();
+    this.sleepQuery().onSnapshot(
+      snapshot => {
+        subject.next(snapshot.docs.map(doc => this.sleepDbMapper.fromDocumentSnapshot(doc)));
+      }
     );
+    return subject.asObservable();
   }
 
-  endSleep(date: string, time: string): Observable<Sleep> {
-    // TODO: jeżeli sen krótszy niż X minut to usuń wpis (z potwierdzeniem?)
-    // TODO: odgadnij i ustaw typ snu (po godzine X i dłuższy niż Y to nocny)
-    const endDate = moment(`${date} ${time}`);
-    return fromPromise(
-      this.sleeps
-        .limit(1)
-        .get()
-    ).pipe(
-      map(result => result.docs[0]),
-      flatMap(sleep => {
-        const sleepStart = moment((sleep.data() as SleepDb).start.date);
-        const sleepDuration = duration(endDate.diff(sleepStart));
-        const longSleepAtNightTime = sleepStart.hours() >= 19 && sleepDuration.asHours() >= 4;
-        return fromPromise(
-          sleep.ref.update(<Partial<SleepDb>>{
-            type: longSleepAtNightTime ? SleepType.night : SleepType.day,
-            end: {
-              date: endDate.format('YYYY-MM-DD HH:mm'),
-              timestamp: endDate.valueOf()
-            },
-            sleep: {
-              text: this.hoursSince.asTime(sleepDuration),
-              time: sleepDuration.asSeconds()
-            }
-          })
-        ).pipe(
-          map(() => sleep.ref)
-        )
-      }),
-      flatMap(docRef => fromPromise(docRef.get())),
-      map(doc => this.sleepDbToSleep(doc.data() as SleepDb))
-    );
-  }
-
-  resumeLastSleep(): Observable<Sleep> {
-    return timer(3000).pipe(
-      map(() => null)
-    );
-  }
-
-  cancelLastSleep(): Observable<Sleep> {
-    return timer(3000).pipe(
-      map(() => null)
-    );
-  }
-
-  private sleepDbToSleep(db: SleepDb): Sleep {
-    return {
-      type: SleepType[db.type],
-      typeString: undefined,
-      start: db.start.date,
-      startHour: moment(db.start.date).format('HH:mm'),
-      end: db.end ? db.end.date : undefined,
-      endHour: db.end ? moment(db.end.date).format('HH:mm') : undefined,
-      sleep: db.sleep ? {
-        text: db.sleep.text,
-        time: db.sleep.time
-      } : undefined,
-      activityBefore: db.activityBefore ? {
-        text: db.activityBefore.text,
-        time: db.activityBefore.time
-      } : undefined
+  async start(date: moment.Moment): Promise<Sleep> {
+    const sleep: SleepDb = {
+      type: SleepType.current,
+      babyId: this.currentBaby.uuid(),
+      start: {
+        date: date.format(SleepService.DATE_FORMAT),
+        timestamp: date.valueOf()
+      }
     };
+    const previous = await this.lastSleep();
+    previous
+      .map(previous => previous.data() as SleepDb)
+      .map(previous => this.activityBetween(moment(previous.end.date), date))
+      .ifPresent(activity => sleep.activityBefore = activity);
+    const document = await this.sleepCollection.add(sleep);
+    return this.sleepDbMapper.fromDocumentSnapshot(await document.get());
+  }
+
+  async end(id: string, date: moment.Moment): Promise<Sleep> {
+    const previousSleep = await this.sleepCollection.doc(id).get();
+    const sleepStart = moment((previousSleep.data() as SleepDb).start.date);
+    const sleepDuration = duration(date.diff(sleepStart));
+    const longSleepAtNightTime = sleepStart.hours() >= 19 && sleepDuration.asHours() >= 4;
+    await previousSleep.ref.update({
+      type: longSleepAtNightTime ? SleepType.night : SleepType.day,
+      end: {
+        date: date.format(SleepService.DATE_FORMAT),
+        timestamp: date.valueOf()
+      },
+      sleep: {
+        text: this.hoursSince.asTime(sleepDuration),
+        time: sleepDuration.asSeconds()
+      }
+    });
+    const updatedSleepDocument = await previousSleep.ref.get();
+    return this.sleepDbMapper.fromDocumentSnapshot(updatedSleepDocument);
+  }
+
+  async resume(id: string): Promise<Sleep> {
+    const sleep = (await this.sleep(id)).get();
+    await sleep.ref.update({
+      end: null,
+      sleep: null,
+      type: SleepType.current
+    });
+    const updatedDocument = await sleep.ref.get();
+    return this.sleepDbMapper.fromDocumentSnapshot(updatedDocument);
+  }
+
+  async cancel(id: string): Promise<void> {
+    const sleep = (await this.sleep(id)).get();
+    await sleep.ref.delete();
+  }
+
+  private async lastSleep(): Promise<Optional<firebase.firestore.QueryDocumentSnapshot>> {
+    try {
+      const sleep = await this.sleepQuery().limit(1).get();
+      return Optional.of(sleep.docs).map(d => d[0])
+    } catch (error) {
+      return Optional.empty();
+    }
+  }
+
+  private activityBetween(before: moment.Moment, now: moment.Moment) {
+    const activityDuration = duration(now.diff(before));
+    return {
+      text: this.hoursSince.asTime(activityDuration),
+      time: activityDuration.asSeconds()
+    };
+  }
+
+  private async sleep(id: string): Promise<Optional<firebase.firestore.QueryDocumentSnapshot>> {
+    return Optional.of(await this.sleepCollection.doc(id).get());
+  }
+
+  private sleepQuery(): firebase.firestore.Query {
+    return this.sleepCollection
+      .where('babyId', '==', this.currentBaby.uuid())
+      .orderBy('start.date', 'desc');
   }
 
 }
