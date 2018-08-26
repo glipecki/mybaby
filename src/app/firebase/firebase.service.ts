@@ -34,7 +34,7 @@ export class FirebaseService {
     }, () => {
       FirebaseService.log.warn('Offline persistence not available');
     });
-    if (environment.production) {
+    if (true || environment.production) {
       LoggerFactory.addAppender(
         new FirebaseLogAppender(
           this.app().firestore().collection('logs'),

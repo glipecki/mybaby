@@ -24,7 +24,7 @@ export class FirebaseLogAppender implements LogAppender {
   constructor(
     private logs: firebase.firestore.CollectionReference,
     private env: string,
-    private logEnhancer: (LogEntry, FirebaseLogEntry) => FirebaseLogEntry & any = l => l) {
+    private logEnhancer: (LogEntry, FirebaseLogEntry) => FirebaseLogEntry & any = (log, db) => db) {
   }
 
   append(log: LogEntry) {
