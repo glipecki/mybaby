@@ -20,7 +20,7 @@ export class AuthService {
   };
 
   constructor(private firebaseService: FirebaseService) {
-    this.firebaseService.getApp().auth().onAuthStateChanged(
+    this.firebaseService.app().auth().onAuthStateChanged(
       (user: firebase.User) => {
         if (user.uid) {
           LoggerFactory.addContext('user', user.uid);
@@ -66,7 +66,7 @@ export class AuthService {
   // TODO: change boolean to status with error message
   login(username: string, password: string): Observable<boolean> {
     const loginSubject = new Subject<boolean>();
-    this.firebaseService.getApp()
+    this.firebaseService.app()
       .auth()
       .signInWithEmailAndPassword(username, password)
       .then(

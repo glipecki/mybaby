@@ -32,7 +32,7 @@ export class NutritionService {
   private readonly meals: firebase.firestore.Query;
 
   constructor(private firebaseService: FirebaseService, private authService: AuthService) {
-    this.meals = this.firebaseService.getApp()
+    this.meals = this.firebaseService.app()
       .firestore()
       .collection('meals')
       .where('userId', '==', this.authService.getUserWrapper().user.uid)
@@ -91,7 +91,7 @@ export class NutritionService {
             date: date
           };
           return fromPromise(
-            this.firebaseService.getApp()
+            this.firebaseService.app()
               .firestore()
               .collection('meals')
               .add(meal)

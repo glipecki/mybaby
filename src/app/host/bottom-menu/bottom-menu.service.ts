@@ -38,7 +38,7 @@ export class BottomMenuService {
       {
         iconType: BottomMenuItemIconType.FAS,
         icon: faPoo,
-        routingPath: RoutingPaths.Default
+        routingPath: RoutingPaths.Poop
       },
       {
         iconType: BottomMenuItemIconType.FAS,

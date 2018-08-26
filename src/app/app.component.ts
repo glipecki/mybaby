@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 import {SwUpdate} from '@angular/service-worker';
 import {Observable} from 'rxjs';
-import {filter} from 'rxjs/operators';
 import {FirebaseService} from './firebase/firebase.service';
 import {LoggerFactory} from './logger/logger-factory';
 
@@ -39,8 +38,10 @@ export class AppComponent {
     this.isOnline$ = firebaseService.isOnline();
     firebaseService.isOnline()
       .subscribe(online => {
-        if (!online) {
-          AppComponent.log.warn('User went offline!')
+        if (online) {
+          AppComponent.log.info('User is online')
+        } else {
+          AppComponent.log.warn('User is offline')
         }
       });
   }

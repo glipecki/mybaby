@@ -15,6 +15,7 @@ if (environment.production) {
 } else {
   LoggerFactory.setRootLevel(LogLevel.TRACE);
 }
+LoggerFactory.addContext('session', Math.random().toString(36).substr(2, 9));
 
 platformBrowserDynamic().bootstrapModule(AppModule)
   .then(() => {

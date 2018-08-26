@@ -14,11 +14,11 @@ import {LoggerFactory} from '../logger/logger-factory';
 export class FirebaseService {
 
   private static readonly log = LoggerFactory.getLogger('FirebaseService');
-  private readonly app: firebase.app.App;
+  private readonly _app: firebase.app.App;
   private readonly online = new Subject<boolean>();
 
   constructor() {
-    this.app = firebase.initializeApp({
+    this._app = firebase.initializeApp({
       apiKey: 'AIzaSyDSHLNEIAum979wzcwywkwUQqqGBOh559k',
       authDomain: 'mybaby-fd205.firebaseapp.com',
       databaseURL: 'https://mybaby-fd205.firebaseio.com',
@@ -26,10 +26,10 @@ export class FirebaseService {
       storageBucket: 'mybaby-fd205.appspot.com',
       messagingSenderId: '830840439048'
     });
-    this.app.firestore().settings({
+    this._app.firestore().settings({
       timestampsInSnapshots: true
     });
-    this.app.firestore().enablePersistence().then(() => {
+    this._app.firestore().enablePersistence().then(() => {
       FirebaseService.log.info('Offline persistence enabled');
     }, () => {
       FirebaseService.log.warn('Offline persistence not available');
@@ -37,7 +37,7 @@ export class FirebaseService {
     if (environment.production) {
       LoggerFactory.addAppender(
         new FirebaseLogAppender(
-          this.getApp().firestore().collection('logs'),
+          this.app().firestore().collection('logs'),
           window.location.host
         )
       );
@@ -53,8 +53,16 @@ export class FirebaseService {
     );
   }
 
-  getApp(): firebase.app.App {
-    return this.app;
+  app(): firebase.app.App {
+    return this._app;
+  }
+
+  firestore(): firebase.firestore.Firestore {
+    return this.app().firestore()
+  }
+
+  collection(path: string): firebase.firestore.CollectionReference {
+    return this.firestore().collection(path);
   }
 
 }

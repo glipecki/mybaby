@@ -33,6 +33,8 @@ import {LoginComponent} from './host/login/login.component';
 import {PageNotFoundComponent} from './host/page-not-found/page-not-found.component';
 import {NutritionDashboardWidgetComponent} from './nutrition/nutrition-dashboard-widget/nutrition-dashboard-widget.component';
 import {PastNutritionsComponent} from './nutrition/past-nutritions/past-nutritions.component';
+import {PoopWidgetComponent} from './poop/poop-widget/poop-widget.component';
+import {PoopsComponent} from './poop/poops/poops.component';
 
 @NgModule({
   declarations: [
@@ -63,7 +65,9 @@ import {PastNutritionsComponent} from './nutrition/past-nutritions/past-nutritio
     PastSleepsSumSleepPipe,
     BabyInfoWidgetComponent,
     TimeSincePipe,
-    WeekSincePipe
+    WeekSincePipe,
+    PoopsComponent,
+    PoopWidgetComponent
   ],
   imports: [
     BrowserModule,

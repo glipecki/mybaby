@@ -26,7 +26,7 @@ export class SleepService {
     private currentBaby: CurrentBabyService,
     private hoursSince: HoursSincePipe,
     private sleepDbMapper: SleepDbMapper) {
-    this.sleepCollection = firebaseService.getApp()
+    this.sleepCollection = firebaseService.app()
       .firestore()
       .collection('sleeps');
   }

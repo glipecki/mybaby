@@ -9,6 +9,7 @@ import moment from 'moment';
     <bb-baby-info-widget *ngIf="day" class="widget"></bb-baby-info-widget>
     <bb-nutrition-dashboard-widget class="widget"></bb-nutrition-dashboard-widget>
     <bb-sleep-dashboard-widget *ngIf="day" class="widget"></bb-sleep-dashboard-widget>
+    <bb-poop-widget *ngIf="day" class="widget"></bb-poop-widget>
     <div class="night-day-switch">
       <fa-icon (click)="switchToNight()" [icon]="dayIcon" *ngIf="day"></fa-icon>
       <fa-icon (click)="switchToDay()" [icon]="nightIcon" *ngIf="night"></fa-icon>

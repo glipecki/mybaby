@@ -6,6 +6,7 @@ export class RoutingPaths {
   static Dashboard = RoutingPaths.path('dashboard');
   static Nutrition = RoutingPaths.path('nutrition');
   static Sleep = RoutingPaths.path('sleep');
+  static Poop = RoutingPaths.path('poop');
 
   private static path(path: string): RoutingPath {
     return {
