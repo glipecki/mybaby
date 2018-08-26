@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import firebase from 'firebase/auth';
 import {concat, Observable, of, Subject} from 'rxjs';
 import {FirebaseService} from '../../firebase/firebase.service';
+import {LoggerFactory} from '../../logger/logger-factory';
 import {UserWrapper} from './user-wrapper';
 
 @Injectable({
@@ -9,6 +10,7 @@ import {UserWrapper} from './user-wrapper';
 })
 export class AuthService {
 
+  private static readonly log = LoggerFactory.getLogger('AuthService');
   private authenticatedSubject = new Subject<boolean>();
   private userSubject = new Subject<{}>();
   private userWrapper: UserWrapper = {
@@ -20,9 +22,15 @@ export class AuthService {
   constructor(private firebaseService: FirebaseService) {
     this.firebaseService.getApp().auth().onAuthStateChanged(
       (user: firebase.User) => {
+        if (user.uid) {
+          LoggerFactory.addContext('user', user.uid);
+        } else {
+          LoggerFactory.removeContext('user');
+        }
         this.userWrapper.user = user;
         this.userWrapper.authenticated = user !== undefined && user !== null;
         this.userWrapper.loading = false;
+        AuthService.log.info('User authentication result [authenticated={}]', this.userWrapper.authenticated);
         this.userSubject.next(this.userWrapper.user);
         this.authenticatedSubject.next(this.userWrapper.authenticated);
       }

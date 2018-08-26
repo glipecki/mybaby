@@ -9,6 +9,7 @@ import {Sleep} from 'src/app/sleep/sleep';
 import {SleepDb} from 'src/app/sleep/sleep-db';
 import {SleepType} from 'src/app/sleep/sleep-type';
 import {CurrentBabyService} from '../common/baby/current-baby.service';
+import {LoggerFactory} from '../logger/logger-factory';
 import {SleepDbMapper} from './sleep-db-mapper';
 
 @Injectable({
@@ -16,6 +17,7 @@ import {SleepDbMapper} from './sleep-db-mapper';
 })
 export class SleepService {
 
+  private static readonly log = LoggerFactory.getLogger('SleepService');
   private static readonly DATE_FORMAT = 'YYYY-MM-DD HH:mm';
   private readonly sleepCollection: firebase.firestore.CollectionReference;
 
@@ -30,6 +32,7 @@ export class SleepService {
   }
 
   lastSleep$(): Observable<Sleep> {
+    SleepService.log.trace('Request for last sleep');
     const subject = new Subject<Sleep>();
     this.sleepQuery().limit(1).onSnapshot(
       snapshot => {
@@ -42,6 +45,7 @@ export class SleepService {
   }
 
   sleeps$(): Observable<Sleep[]> {
+    SleepService.log.trace('Request for all sleeps');
     const subject = new Subject<Sleep[]>();
     this.sleepQuery().onSnapshot(
       snapshot => {
@@ -52,9 +56,10 @@ export class SleepService {
   }
 
   async start(date: moment.Moment): Promise<Sleep> {
+    SleepService.log.info('Start sleep [date={}]', date.format(SleepService.DATE_FORMAT));
     const sleep: SleepDb = {
       type: SleepType.current,
-      babyId: this.currentBaby.uuid(),
+      babyId: this.currentBaby.id(),
       start: {
         date: date.format(SleepService.DATE_FORMAT),
         timestamp: date.valueOf()
@@ -70,7 +75,8 @@ export class SleepService {
   }
 
   async end(id: string, date: moment.Moment): Promise<Sleep> {
-    const previousSleep = await this.sleepCollection.doc(id).get();
+    SleepService.log.info('End sleep [id={}, date={}]', id, date.format(SleepService.DATE_FORMAT));
+    const previousSleep = (await this.sleep(id)).orThrow(() => new Error('Sleep with expected id not found'));
     const sleepStart = moment((previousSleep.data() as SleepDb).start.date);
     const sleepDuration = duration(date.diff(sleepStart));
     const longSleepAtNightTime = sleepStart.hours() >= 19 && sleepDuration.asHours() >= 4;
@@ -90,7 +96,8 @@ export class SleepService {
   }
 
   async resume(id: string): Promise<Sleep> {
-    const sleep = (await this.sleep(id)).get();
+    SleepService.log.info('Resume sleep [id={}]', id);
+    const sleep = (await this.sleep(id)).orThrow(() => new Error('Sleep with expected id not found'));
     await sleep.ref.update({
       end: null,
       sleep: null,
@@ -101,7 +108,8 @@ export class SleepService {
   }
 
   async cancel(id: string): Promise<void> {
-    const sleep = (await this.sleep(id)).get();
+    SleepService.log.info('Cancel sleep [id={}]', id);
+    const sleep = (await this.sleep(id)).orThrow(() => new Error('Sleep with expected id not found'));
     await sleep.ref.delete();
   }
 
@@ -128,7 +136,7 @@ export class SleepService {
 
   private sleepQuery(): firebase.firestore.Query {
     return this.sleepCollection
-      .where('babyId', '==', this.currentBaby.uuid())
+      .where('babyId', '==', this.currentBaby.id())
       .orderBy('start.date', 'desc');
   }
 

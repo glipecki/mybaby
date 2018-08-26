@@ -1,3 +1,5 @@
+@import 'variables';
+
 :host {
   $bottom-menu-height: 60px;
   display: flex;
@@ -11,6 +13,20 @@
     left: 0;
     right: 0;
     bottom: $bottom-menu-height;
+  }
+  .offline {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    bottom: $bottom-menu-height;
+    left: 0;
+    right: 0;
+    color: $color-red;
+    font-weight: bold;
+    border: 1px solid $color-red;
+    background-color: $color-gray-700;
   }
   bb-bottom-menu {
     position: fixed;

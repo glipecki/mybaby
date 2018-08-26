@@ -5,6 +5,8 @@ import {HoursSincePipe} from 'src/app/components/hours-since/hours-since.pipe';
 import {Breast} from 'src/app/nutrition/breast'
 import {Meal} from 'src/app/nutrition/meal';
 import {NutritionService} from 'src/app/nutrition/nutrition.service';
+import {LoggerFactory} from '../../logger/logger-factory';
+import {UserInteractionService} from '../../user-interaction/user-interaction.service';
 
 @Component({
   selector: 'bb-nutrition-dashboard-widget',
@@ -39,6 +41,8 @@ import {NutritionService} from 'src/app/nutrition/nutrition.service';
 })
 export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
 
+  private static  readonly log = LoggerFactory.getLogger('NutritionDashboardWidgetComponent');
+
   // noinspection JSUnusedGlobalSymbols - used by template
   Breast = Breast;
   icon = faUtensils;
@@ -49,8 +53,13 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
   recommendedBreast: Breast;
   private hoursSinceSubscription: Subscription;
   private lastMealSubscription: Subscription;
+  private readonly userTracker: (interaction: string) => void;
 
-  constructor(private service: NutritionService, private hoursSince: HoursSincePipe) {
+  constructor(
+    private service: NutritionService,
+    private hoursSince: HoursSincePipe,
+    userInteractionService: UserInteractionService) {
+    this.userTracker = userInteractionService.getTracker('NutritionDashboardWidgetComponent');
   }
 
   ngOnInit(): void {
@@ -67,6 +76,7 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
   }
 
   leftBreastClicked() {
+    this.userTracker( 'User selected left breast meal');
     this.adding = true;
     this.service.addMeal(Breast.left).subscribe(
       () => {
@@ -77,6 +87,7 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
   }
 
   rightBreastClicked() {
+    this.userTracker( 'User selected right breast meal');
     this.adding = true;
     this.service.addMeal(Breast.right).subscribe(
       () => {

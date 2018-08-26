@@ -6,6 +6,7 @@ import {DashboardWidgetComponent} from 'src/app/components/dashboard-widget/dash
 import {Sleep} from 'src/app/sleep/sleep';
 import {SleepDateSelected} from 'src/app/sleep/sleep-dashboard-widget/sleep-widget-sleep-change/sleep-date-selected';
 import {SleepService} from 'src/app/sleep/sleep.service';
+import {UserInteractionService} from '../../user-interaction/user-interaction.service';
 
 @Component({
   selector: 'bb-sleep-dashboard-widget',
@@ -60,8 +61,10 @@ export class SleepDashboardWidgetComponent implements OnInit {
   lastSleep: Sleep;
 
   @ViewChild(DashboardWidgetComponent) private widget: DashboardWidgetComponent;
+  private userTracker: (interaction: string) => void;
 
-  constructor(private service: SleepService) {
+  constructor(private service: SleepService, userInteractionService: UserInteractionService) {
+    this.userTracker = userInteractionService.getTracker('SleepDashboardWidgetComponent');
   }
 
   ngOnInit(): void {
@@ -82,6 +85,7 @@ export class SleepDashboardWidgetComponent implements OnInit {
   }
 
   async startDateSelected($event: SleepDateSelected) {
+    this.userTracker(`User selected sleep start date [${$event.date} ${$event.time}]`)
     this.inProgress = true;
     await this.service.start(moment(`${$event.date} ${$event.time}`));
     this.inProgress = false;

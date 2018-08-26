@@ -13,7 +13,6 @@ export class PastSleepsAvgDaySleepPipe implements PipeTransform {
   constructor(private hoursSince: HoursSincePipe) {
   }
 
-
   transform(value: any, args?: any): any {
     return this.avgDaySleepTime(value);
   }
