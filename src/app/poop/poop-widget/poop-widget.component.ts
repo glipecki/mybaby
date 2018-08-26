@@ -1,16 +1,17 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {faPoo} from '@fortawesome/free-solid-svg-icons/faPoo';
-import {Observable} from 'rxjs';
+import moment from 'moment';
+import {interval, Subscription} from 'rxjs';
+import {TimeSincePipe} from '../../components/time-since/time-since.pipe';
 import {Poop, PoopSize} from '../poop';
 import {PoopService} from '../poop.service';
-import moment from 'moment';
 
 @Component({
   selector: 'bb-poop-widget',
   template: `
     <bb-dashboard-widget [header]="'Kupy'" [icon]="icon">
-      <div *ngIf="lastPoop$ | async as lastPoop" class="stats">
-        <div>Od ostatniej kupy: <em>{{lastPoop.date | hoursSince}} ({{keys[lastPoop.size]}})</em></div>
+      <div *ngIf="lastPoop" class="stats">
+        <div>Od ostatniej kupy: <em>{{sinceLastPoop}} ({{keys[lastPoop.size]}})</em></div>
       </div>
       <div class="actions">
         <ng-container *ngIf="!actionStatus && !adding">
@@ -29,7 +30,7 @@ import moment from 'moment';
     './poop-widget.component.scss'
   ]
 })
-export class PoopWidgetComponent implements OnInit {
+export class PoopWidgetComponent implements OnInit, OnDestroy {
 
   readonly icon = faPoo;
   readonly keys = {
@@ -39,17 +40,36 @@ export class PoopWidgetComponent implements OnInit {
     [PoopSize.medium]: 'średnia',
     [PoopSize.small]: 'mała'
   };
-  readonly sizes = [PoopSize.small, PoopSize.medium, PoopSize.abundant, PoopSize.big, PoopSize.big];
+  readonly sizes = [PoopSize.small, PoopSize.medium, PoopSize.abundant, PoopSize.big, PoopSize.mega];
   sinceLastPoop: string = 'n/a';
   adding: boolean = false;
   actionStatus: string = undefined;
-  lastPoop$: Observable<Poop>;
+  lastPoop: Poop;
+  private timeSinceSubscription: Subscription;
+  private lastPoopSubscription: Subscription;
 
-  constructor(private service: PoopService) {
+  constructor(private service: PoopService, private timeSince: TimeSincePipe) {
   }
 
   ngOnInit(): void {
-    this.lastPoop$ = this.service.lastPoop$();
+    this.lastPoopSubscription = this.service.lastPoop$().subscribe(
+      poop => {
+        this.lastPoop = poop;
+        this.sinceLastPoop = this.timeSince.transform(this.lastPoop.date);
+      }
+    );
+    this.timeSinceSubscription = interval(1000).subscribe(() => {
+      if (this.lastPoop) {
+        this.sinceLastPoop = this.timeSince.transform(this.lastPoop.date)
+      } else {
+        this.sinceLastPoop = '';
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.lastPoopSubscription.unsubscribe();
+    this.timeSinceSubscription.unsubscribe();
   }
 
   async add(size: PoopSize) {

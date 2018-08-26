@@ -8,7 +8,6 @@ import {DateTimePickerComponent} from 'src/app/components/date-time-picker/date-
 import {ListWithDayGroupingComponent} from 'src/app/components/list-with-day-groupping/list-with-day-grouping.component';
 import {OperationWithConfirmComponent} from 'src/app/components/operation-with-confirm/operation-with-confirm.component';
 import {HoursSincePipe} from 'src/app/components/hours-since/hours-since.pipe';
-import {TimeSincePipe} from 'src/app/components/time-since/time-since.pipe';
 import {PastSleepsAvgDaySleepPipe} from 'src/app/sleep/past-sleeps/past-sleeps-avg-day-sleep.pipe';
 import {PastSleepsSumDaySleepPipe} from 'src/app/sleep/past-sleeps/past-sleeps-sum-day-sleep.pipe';
 import {PastSleepsSumNightSleepPipe} from 'src/app/sleep/past-sleeps/past-sleeps-sum-night-sleep.pipe';
@@ -25,6 +24,8 @@ import {ButtonComponent} from './components/button/button.component';
 import {CardComponent} from './components/card/card.component';
 import {DashboardWidgetComponent} from './components/dashboard-widget/dashboard-widget.component';
 import {FlatButtonComponent} from './components/flat-button/flat-button.component';
+import {DaysSincePipe} from './components/days-since/days-since.pipe';
+import {TimeSincePipe} from './components/time-since/time-since.pipe';
 import {WeekSincePipe} from './components/week-since/week-since.pipe';
 import {BottomMenuItemComponent} from './host/bottom-menu/bottom-menu-item/bottom-menu-item.component';
 import {BottomMenuComponent} from './host/bottom-menu/bottom-menu.component';
@@ -64,10 +65,11 @@ import {PoopsComponent} from './poop/poops/poops.component';
     PastSleepsSumNightSleepPipe,
     PastSleepsSumSleepPipe,
     BabyInfoWidgetComponent,
-    TimeSincePipe,
+    DaysSincePipe,
     WeekSincePipe,
     PoopsComponent,
-    PoopWidgetComponent
+    PoopWidgetComponent,
+    TimeSincePipe
   ],
   imports: [
     BrowserModule,
@@ -78,6 +80,7 @@ import {PoopsComponent} from './poop/poops/poops.component';
   ],
   providers: [
     HoursSincePipe,
+    DaysSincePipe,
     TimeSincePipe
   ],
   bootstrap: [AppComponent]

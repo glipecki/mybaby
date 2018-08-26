@@ -27,7 +27,7 @@ import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
           <fa-icon [icon]="faChild"></fa-icon>
         </div>
         <div class="data">
-          <div>{{ '2018-03-30' | timeSince }}</div>
+          <div>{{ '2018-03-30' | daysSince }}</div>
           <div>{{ '2018-03-30' | weekSince }}</div>
         </div>
       </div>

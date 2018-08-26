@@ -2,9 +2,9 @@ import {Pipe, PipeTransform} from '@angular/core';
 import moment from 'moment';
 
 @Pipe({
-  name: 'timeSince'
+  name: 'daysSince'
 })
-export class TimeSincePipe implements PipeTransform {
+export class DaysSincePipe implements PipeTransform {
 
   transform(value: any, args?: any): any {
     const duration = moment.duration(moment().diff(moment(value)));
@@ -18,14 +18,8 @@ export class TimeSincePipe implements PipeTransform {
     if (duration.days() > 0) {
       parts.push(`${duration.days()} dni`)
     }
-    if (duration.hours() > 0) {
-      parts.push(`${duration.hours()} godzin`)
-    }
-    if (duration.minutes() > 0) {
-      parts.push(`${duration.minutes()} minut`)
-    }
     if (parts.length === 0) {
-      parts.push('teraz');
+      parts.push('dzisiaj')
     }
     return parts.join(' i ');
   }

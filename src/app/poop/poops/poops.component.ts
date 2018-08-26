@@ -13,7 +13,7 @@ import {PoopService} from '../poop.service';
         {{day.dateString}}
       </ng-template>
       <ng-template #row let-row>
-        kupa: {{row | json}}
+        {{row.date}}: {{row.size}}
       </ng-template>
     </bb-list-with-day-grouping>
   `,
