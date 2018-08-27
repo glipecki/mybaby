@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import moment from 'moment';
 import {Observable} from 'rxjs';
-import {Poop} from '../poop';
+import {Poop, PoopSizeKeys} from '../poop';
 import {PoopService} from '../poop.service';
 
 @Component({
@@ -13,7 +13,7 @@ import {PoopService} from '../poop.service';
         {{day.dateString}}
       </ng-template>
       <ng-template #row let-row>
-        {{row.date}}: {{row.size}}
+        {{row.date}}: {{keys[row.size]}}
       </ng-template>
     </bb-list-with-day-grouping>
   `,
@@ -23,6 +23,7 @@ import {PoopService} from '../poop.service';
 })
 export class PoopsComponent implements OnInit {
 
+  readonly keys = PoopSizeKeys;
   poopDateExtractor = (poop: Poop) => moment(poop.date);
   poops$: Observable<Poop[]>;
 

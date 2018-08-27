@@ -3,7 +3,7 @@ import {faPoo} from '@fortawesome/free-solid-svg-icons/faPoo';
 import moment from 'moment';
 import {interval, Subscription} from 'rxjs';
 import {TimeSincePipe} from '../../components/time-since/time-since.pipe';
-import {Poop, PoopSize} from '../poop';
+import {Poop, PoopSize, PoopSizeKeys} from '../poop';
 import {PoopService} from '../poop.service';
 
 @Component({
@@ -32,15 +32,9 @@ import {PoopService} from '../poop.service';
 })
 export class PoopWidgetComponent implements OnInit, OnDestroy {
 
+  readonly keys = PoopSizeKeys;
   readonly icon = faPoo;
-  readonly keys = {
-    [PoopSize.mega]: 'mega',
-    [PoopSize.big]: 'duża',
-    [PoopSize.abundant]: 'obfita',
-    [PoopSize.medium]: 'średnia',
-    [PoopSize.small]: 'mała'
-  };
-  readonly sizes = [PoopSize.small, PoopSize.medium, PoopSize.abundant, PoopSize.big, PoopSize.mega];
+  readonly sizes = [PoopSize.small, PoopSize.medium, PoopSize.big, PoopSize.mega];
   sinceLastPoop: string = 'n/a';
   adding: boolean = false;
   actionStatus: string = undefined;
