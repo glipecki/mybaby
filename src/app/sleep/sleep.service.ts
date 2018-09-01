@@ -61,8 +61,7 @@ export class SleepService {
       type: SleepType.current,
       babyId: this.currentBaby.id(),
       start: {
-        date: date.format(SleepService.DATE_FORMAT),
-        timestamp: date.valueOf()
+        date: date.format(SleepService.DATE_FORMAT)
       }
     };
     const previous = await this.lastSleep();
@@ -83,8 +82,7 @@ export class SleepService {
     await previousSleep.ref.update({
       type: longSleepAtNightTime ? SleepType.night : SleepType.day,
       end: {
-        date: date.format(SleepService.DATE_FORMAT),
-        timestamp: date.valueOf()
+        date: date.format(SleepService.DATE_FORMAT)
       },
       sleep: {
         text: this.hoursSince.asTime(sleepDuration),

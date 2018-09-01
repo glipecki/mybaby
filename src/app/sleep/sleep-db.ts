@@ -3,11 +3,9 @@ export interface SleepDb {
   babyId: string;
   start: {
     date: string;
-    timestamp: number;
   };
   end?: {
     date: string;
-    timestamp: number;
   };
   sleep?: {
     text: string;

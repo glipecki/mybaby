@@ -22,7 +22,7 @@ export class AuthService {
   constructor(private firebaseService: FirebaseService) {
     this.firebaseService.app().auth().onAuthStateChanged(
       (user: firebase.User) => {
-        if (user.uid) {
+        if (user) {
           LoggerFactory.addContext('user', user.email);
         } else {
           LoggerFactory.removeContext('user');
@@ -30,7 +30,7 @@ export class AuthService {
         this.userWrapper.user = user;
         this.userWrapper.authenticated = user !== undefined && user !== null;
         this.userWrapper.loading = false;
-        AuthService.log.info('User authentication result [authenticated={}]', this.userWrapper.authenticated);
+        AuthService.log.debug('User authentication result [authenticated={}]', this.userWrapper.authenticated);
         this.userSubject.next(this.userWrapper.user);
         this.authenticatedSubject.next(this.userWrapper.authenticated);
       }

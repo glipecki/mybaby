@@ -54,11 +54,9 @@ export class NutritionService {
   }
 
   addMeal(brest: Breast): Observable<Meal> {
-    const timestamp: number = moment().valueOf();
-    const date: string = moment(timestamp).format(NutritionService.DATE_FORMAT);
+    const date: string = moment().format(NutritionService.DATE_FORMAT);
     const mealBreast: BreastDb = {
       breast: brest,
-      timestamp: timestamp,
       date: date
     };
     return fromPromise(
@@ -87,7 +85,6 @@ export class NutritionService {
             userId: this.authService.getUserWrapper().user.uid,
             babyId: 'oezcGwNonYiNDsYQ6B8g',
             breasts: [mealBreast],
-            timestamp: moment().valueOf(),
             date: date
           };
           return fromPromise(
