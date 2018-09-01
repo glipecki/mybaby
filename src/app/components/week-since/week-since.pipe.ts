@@ -8,7 +8,7 @@ export class WeekSincePipe implements PipeTransform {
 
   transform(value: any, args?: any): any {
     const duration = moment.duration(moment().diff(moment(value)));
-    return `${Number(duration.asWeeks()).toFixed()} tygodni`;
+    return `${Math.floor(duration.asWeeks())} tygodni`;
   }
 
 }
