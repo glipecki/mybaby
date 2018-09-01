@@ -10,14 +10,14 @@ import {AuthService} from '../../common/auth/auth.service';
   template: `
     <div>
       Użytkownik:
-      <input #username />
+      <input #username/>
     </div>
     <div>
       Hasło:
-      <input #password />
+      <input #password/>
     </div>
     <div>
-      <button (click)="login(username.value, password.value)">zaloguj</button>
+      <button (click)="login(username.data, password.data)">zaloguj</button>
     </div>
     <div *ngIf="message">
       {{message}}

@@ -1,6 +1,8 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+import {Logs} from 'selenium-webdriver';
 import {PastSleepsComponent} from 'src/app/sleep/past-sleeps/past-sleeps.component';
+import {LogsComponent} from './admin/logs/logs.component';
 import {UserAuthenticatedGuard} from './common/auth/user-authenticated.guard';
 import {DashboardComponent} from './host/dashboard/dashboard.component';
 import {LoginComponent} from './host/login/login.component';
@@ -32,6 +34,11 @@ const routes: Routes = [
   {
     path: 'poop',
     component: PoopsComponent,
+    canActivate: [UserAuthenticatedGuard]
+  },
+  {
+    path: 'logs',
+    component: LogsComponent,
     canActivate: [UserAuthenticatedGuard]
   },
   {

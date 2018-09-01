@@ -36,21 +36,13 @@ export class AppComponent {
   constructor(swUpdate: SwUpdate, firebaseService: FirebaseService, networkStatus: NetworkStatusService) {
     if (swUpdate.isEnabled) {
       swUpdate.available.subscribe(
-        update => {
+        () => {
           AppComponent.log.info('App update available for user');
           this.appUpdate = {}
         }
       );
     }
     this.isOnline$ = networkStatus.isOnline();
-    networkStatus.isOnline()
-      .subscribe(online => {
-        if (online) {
-          AppComponent.log.info('User is online')
-        } else {
-          AppComponent.log.warn('User is offline')
-        }
-      });
   }
 
   refreshApp() {

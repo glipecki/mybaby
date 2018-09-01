@@ -18,6 +18,7 @@ import {SleepWidgetSleepChangeComponent} from 'src/app/sleep/sleep-dashboard-wid
 import {SleepWidgetSummaryActiveComponent} from 'src/app/sleep/sleep-dashboard-widget/sleep-widget-summary-active/sleep-widget-summary-active.component';
 import {SleepWidgetSummarySleepingComponent} from 'src/app/sleep/sleep-dashboard-widget/sleep-widget-summary-sleeping/sleep-widget-summary-sleeping.component';
 import {environment} from '../environments/environment';
+import {LogsComponent} from './admin/logs/logs.component';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {ButtonComponent} from './components/button/button.component';
@@ -69,7 +70,8 @@ import {PoopsComponent} from './poop/poops/poops.component';
     WeekSincePipe,
     PoopsComponent,
     PoopWidgetComponent,
-    TimeSincePipe
+    TimeSincePipe,
+    LogsComponent
   ],
   imports: [
     BrowserModule,

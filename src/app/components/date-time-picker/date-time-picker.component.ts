@@ -3,8 +3,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 @Component({
   selector: 'bb-date-time-picker',
   template: `
-    <input type="date" [value]="date" (input)="onDateChanged($event.currentTarget.value)" />
-    <input type="time" [value]="time" (input)="onTimeChanged($event.currentTarget.value)" />
+    <input type="date" [value]="date" (input)="onDateChanged($event.currentTarget.data)"/>
+    <input type="time" [value]="time" (input)="onTimeChanged($event.currentTarget.data)"/>
   `,
   styleUrls: [
     './date-time-picker.component.scss'

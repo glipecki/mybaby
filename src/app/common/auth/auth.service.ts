@@ -23,7 +23,7 @@ export class AuthService {
     this.firebaseService.app().auth().onAuthStateChanged(
       (user: firebase.User) => {
         if (user.uid) {
-          LoggerFactory.addContext('user', user.uid);
+          LoggerFactory.addContext('user', user.email);
         } else {
           LoggerFactory.removeContext('user');
         }

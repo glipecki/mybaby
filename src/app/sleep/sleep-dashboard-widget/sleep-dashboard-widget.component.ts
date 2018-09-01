@@ -61,7 +61,7 @@ export class SleepDashboardWidgetComponent implements OnInit {
   lastSleep: Sleep;
 
   @ViewChild(DashboardWidgetComponent) private widget: DashboardWidgetComponent;
-  private userTracker: (interaction: string) => void;
+  private readonly userTracker: (interaction: string) => void;
 
   constructor(private service: SleepService, userInteractionService: UserInteractionService) {
     this.userTracker = userInteractionService.getTracker('SleepDashboardWidgetComponent');
