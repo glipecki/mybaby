@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {SwUpdate} from '@angular/service-worker';
+import {faSync} from '@fortawesome/free-solid-svg-icons/faSync';
 import {Observable} from 'rxjs';
 import {FirebaseService} from './firebase/firebase.service';
 import {LoggerFactory} from './logger/logger-factory';
@@ -16,6 +17,10 @@ import {LoggerFactory} from './logger/logger-factory';
     <div class="offline" *ngIf="!(isOnline$ | async)" (click)="refreshApp()">
       Uwaga! Jesteś offline!
     </div>
+    <div class="refresh" (click)="refreshApp()">
+      <div class="label">odśwież</div>
+      <div><fa-icon [icon]="refreshIcon"></fa-icon></div>
+    </div>
     <bb-bottom-menu></bb-bottom-menu>
   `,
   styleUrls: ['./app.component.scss']
@@ -25,6 +30,7 @@ export class AppComponent {
   static readonly log = LoggerFactory.getLogger('AppComponent');
   appUpdate: {};
   isOnline$: Observable<boolean>;
+  refreshIcon = faSync;
 
   constructor(swUpdate: SwUpdate, firebaseService: FirebaseService) {
     if (swUpdate.isEnabled) {
@@ -47,6 +53,7 @@ export class AppComponent {
   }
 
   refreshApp() {
+    AppComponent.log.info('User forced app refresh');
     window.location.reload();
   }
 
