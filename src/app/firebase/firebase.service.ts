@@ -29,12 +29,7 @@ export class FirebaseService {
     this._app.firestore().settings({
       timestampsInSnapshots: true
     });
-    this._app.firestore().enablePersistence().then(() => {
-      FirebaseService.log.info('Offline persistence enabled');
-    }, () => {
-      FirebaseService.log.warn('Offline persistence not available');
-    });
-    if (true || environment.production) {
+    if (environment.production) {
       LoggerFactory.addAppender(
         new FirebaseLogAppender(
           this.app().firestore().collection('logs'),
