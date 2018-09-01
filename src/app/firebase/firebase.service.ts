@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
 import firebase from 'firebase/app';
 import 'firebase/auth';
-import 'firebase/firestore';
 import 'firebase/database';
-import {merge, Observable, of, Subject} from 'rxjs';
+import 'firebase/firestore';
 import {environment} from '../../environments/environment';
 import {FirebaseLogAppender} from '../logger/firebase-log-appender';
 import {LoggerFactory} from '../logger/logger-factory';
@@ -15,7 +14,6 @@ export class FirebaseService {
 
   private static readonly log = LoggerFactory.getLogger('FirebaseService');
   private readonly _app: firebase.app.App;
-  private readonly online = new Subject<boolean>();
 
   constructor() {
     this._app = firebase.initializeApp({
@@ -37,15 +35,6 @@ export class FirebaseService {
         )
       );
     }
-    window.addEventListener('offline', () => this.online.next(false));
-    window.addEventListener('online', () => this.online.next(true));
-  }
-
-  isOnline(): Observable<boolean> {
-    return merge(
-      of(window.navigator.onLine),
-      this.online
-    );
   }
 
   app(): firebase.app.App {

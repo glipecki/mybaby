@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {SwUpdate} from '@angular/service-worker';
 import {faSync} from '@fortawesome/free-solid-svg-icons/faSync';
 import {Observable} from 'rxjs';
+import {NetworkStatusService} from './common/network/network-status.service';
 import {FirebaseService} from './firebase/firebase.service';
 import {LoggerFactory} from './logger/logger-factory';
 
@@ -32,7 +33,7 @@ export class AppComponent {
   isOnline$: Observable<boolean>;
   refreshIcon = faSync;
 
-  constructor(swUpdate: SwUpdate, firebaseService: FirebaseService) {
+  constructor(swUpdate: SwUpdate, firebaseService: FirebaseService, networkStatus: NetworkStatusService) {
     if (swUpdate.isEnabled) {
       swUpdate.available.subscribe(
         update => {
@@ -41,8 +42,8 @@ export class AppComponent {
         }
       );
     }
-    this.isOnline$ = firebaseService.isOnline();
-    firebaseService.isOnline()
+    this.isOnline$ = networkStatus.isOnline();
+    networkStatus.isOnline()
       .subscribe(online => {
         if (online) {
           AppComponent.log.info('User is online')
