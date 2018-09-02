@@ -47,7 +47,10 @@ export class AppComponent {
 
   refreshApp() {
     AppComponent.log.info('User forced app refresh');
-    window.location.reload();
+    setTimeout(
+      () => window.location.reload(),
+      500
+    );
   }
 
 }
