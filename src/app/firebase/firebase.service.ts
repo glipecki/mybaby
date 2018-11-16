@@ -27,6 +27,9 @@ export class FirebaseService {
     this._app.firestore().settings({
       timestampsInSnapshots: true
     });
+    this._app.firestore().enablePersistence({
+      experimentalTabSynchronization: true
+    });
     if (environment.production) {
       LoggerFactory.addAppender(
         new FirebaseLogAppender(
