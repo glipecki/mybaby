@@ -1,62 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:mybaby_mobile/auth/actions/check_authentication_action.dart';
+import 'package:mybaby_mobile/auth/actions/sign_in_with_email_action.dart';
+import 'package:mybaby_mobile/auth/actions/sign_in_with_google_action.dart';
+import 'package:mybaby_mobile/auth/actions/sign_out_action.dart';
+import 'package:mybaby_mobile/common/redux/async.dart';
+import 'package:mybaby_mobile/injector.dart';
+import 'package:mybaby_mobile/my_baby.dart';
+import 'package:mybaby_mobile/state/app_state.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_logging/redux_logging.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'MyBaby'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
+void main() {
+  var asyncMiddleware = AsyncMiddleware();
+  asyncMiddleware.take(
+      CheckAuthenticationAction, injector.checkAuthenticationSaga());
+  asyncMiddleware.take(SignInWithEmailAction, injector.loginWithEmailSaga());
+  asyncMiddleware.take(SignInWithGoogleAction, injector.signInWithGoogleSaga());
+  asyncMiddleware.take(SignOutAction, injector.logOutSaga());
+  asyncMiddleware.take(SignOutAction, injector.signOutWithGoogleSaga());
+  var store = Store<AppState>(
+    combineReducers([
+      injector.authenticationStateReducer(),
+    ]),
+    initialState: AppState.initial(),
+    middleware: [
+      LoggingMiddleware.printer(),
+      asyncMiddleware,
+    ],
+  );
+  return runApp(
+    StoreProvider<AppState>(
+      store: store,
+      child: MyBaby(),
+    ),
+  );
 }

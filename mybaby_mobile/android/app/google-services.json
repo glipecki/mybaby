@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "830840439048",
+    "firebase_url": "https://mybaby-fd205.firebaseio.com",
+    "project_id": "mybaby-fd205",
+    "storage_bucket": "mybaby-fd205.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:830840439048:android:067a62c20e524fbf",
+        "android_client_info": {
+          "package_name": "net.lipecki.mybaby"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "830840439048-nbb96jn57rkofropes4a829balaeaoch.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.lipecki.mybaby",
+            "certificate_hash": "dccfccd3dae9cb1225e37e3dc996cbf15bbde99b"
+          }
+        },
+        {
+          "client_id": "830840439048-lu2qqg00agp6elv2oh71fciejs3nvh5f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkxUDkl55uVxoPJ83_4jMqFwD_GpIPdK8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "830840439048-lu2qqg00agp6elv2oh71fciejs3nvh5f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "830840439048-0kdk6hku0v8f7k1no3h5jk2q1u3o49g7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.lipecki.mybaby"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
