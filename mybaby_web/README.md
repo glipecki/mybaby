@@ -1,0 +1,26 @@
+### TODO
+
+- quick and dirty
+  - reorganize code
+  - check nutrition service
+  - tests
+- security
+  - check if user has link to baby
+  - check if meal has baby id (valid one)
+  - remove userId from meal?
+- multi babies
+  - check babies count
+  - ask which to use if more than one active
+  - change baby screen/menu?
+  - test baby
+- nutrition
+  - daily statistics
+  - charts
+  - editing
+  - adding custom
+- poops
+  - all
+- measurements
+  - all
+- sleep
+  - all

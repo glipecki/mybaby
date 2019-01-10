@@ -1,0 +1,52 @@
+@import 'variables';
+
+:host {
+  $bottom-menu-height: 60px;
+  display: flex;
+  flex-direction: column;
+  .content {
+    margin-bottom: $bottom-menu-height;
+  }
+  .app-update {
+    position: fixed;
+    padding: 8px 10px;
+    left: 0;
+    right: 0;
+    bottom: $bottom-menu-height;
+  }
+  .offline {
+    cursor: pointer;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    bottom: $bottom-menu-height;
+    left: 0;
+    right: 0;
+    color: $color-red;
+    font-weight: bold;
+    border: 1px solid $color-red;
+    background-color: $color-gray-700;
+  }
+  .refresh {
+    cursor: pointer;
+    display: flex;
+    position: fixed;
+    bottom: $bottom-menu-height + 10px;
+    right: 15px;
+    font-size: 15px;
+    color: $color-gray-600;
+    .label {
+      margin-right: 5px;
+    }
+  }
+  bb-bottom-menu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: $bottom-menu-height;
+    overflow: hidden;
+  }
+}

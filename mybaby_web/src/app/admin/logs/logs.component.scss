@@ -1,0 +1,22 @@
+@import 'variables';
+
+:host {
+  display: block;
+  padding: 15px;
+  .row {
+    display: flex;
+    margin-bottom: 3px;
+    padding-bottom: 2px;
+    &:not(:last-of-type) {
+      border-bottom: 1px solid $color-gray-600;
+    }
+  }
+  .column {
+    &:not(:last-of-type) {
+      margin-right: 8px;
+    }
+    &.light {
+      color: $color-gray-600;
+    }
+  }
+}

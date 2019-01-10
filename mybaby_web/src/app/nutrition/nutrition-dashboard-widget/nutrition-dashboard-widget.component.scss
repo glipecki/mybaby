@@ -1,0 +1,25 @@
+@import 'variables';
+
+:host {
+  display: block;
+  .stats {
+    word-break: break-all;
+  }
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: 8px 0;
+    align-items: center;
+    bb-button {
+      margin: 0 4px;
+      width: 100px;
+    }
+  }
+  .action-status {
+    color: $color-success;
+  }
+}
+
+bb-button.recommended {
+  background-color: $color-success;
+}
