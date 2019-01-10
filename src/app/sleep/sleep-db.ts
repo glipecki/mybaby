@@ -14,5 +14,5 @@ export interface SleepDb {
   activityBefore?: {
     text: string;
     time: number;
-  }
+  };
 }

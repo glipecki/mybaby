@@ -5,39 +5,44 @@ import {faChild} from '@fortawesome/free-solid-svg-icons/faChild';
 import {faEllipsisV} from '@fortawesome/free-solid-svg-icons/faEllipsisV';
 import {faIdCard} from '@fortawesome/free-solid-svg-icons/faIdCard';
 import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
+import {BabyService} from '../baby.service';
+import {Observable} from 'rxjs';
+import {Baby} from '../baby';
 
 @Component({
   selector: 'bb-baby-info-widget',
   template: `
-    <div class="header">
-      <div class="name">Oskar Tomasz Lipecki</div>
-      <div>
-        <fa-icon [icon]="viewState === 'visible' ? iconClose : iconExpand" (click)="expandToggleClicked()"></fa-icon>
-      </div>
-    </div>
-    <div class="details" [@shrinkInOut]="viewState">
-      <div class="row">
-        <div class="icon">
-          <fa-icon [icon]="faBirthdayCake"></fa-icon>
-        </div>
-        <div class="data">30.03.2018</div>
-      </div>
-      <div class="row">
-        <div class="icon">
-          <fa-icon [icon]="faChild"></fa-icon>
-        </div>
-        <div class="data">
-          <div>{{ '2018-03-30' | daysSince }}</div>
-          <div>{{ '2018-03-30' | weekSince }}</div>
+    <ng-container *ngIf="user$ | async; let user">
+      <div class="header">
+        <div class="name">{{user?.firstName}} {{user?.secondName}} {{user?.surname}}</div>
+        <div>
+          <fa-icon [icon]="viewState === 'visible' ? iconClose : iconExpand" (click)="expandToggleClicked()"></fa-icon>
         </div>
       </div>
-      <div class="row">
-        <div class="icon">
-          <fa-icon [icon]="faIdCard"></fa-icon>
+      <div class="details" [@shrinkInOut]="viewState">
+        <div class="row">
+          <div class="icon">
+            <fa-icon [icon]="faBirthdayCake"></fa-icon>
+          </div>
+          <div class="data">{{ user?.birthday  }}</div>
         </div>
-        <div class="data">123456789</div>
+        <div class="row">
+          <div class="icon">
+            <fa-icon [icon]="faChild"></fa-icon>
+          </div>
+          <div class="data">
+            <div>{{ user?.birthday | daysSince }}</div>
+            <div>{{ user?.birthday  | weekSince }}</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="icon">
+            <fa-icon [icon]="faIdCard"></fa-icon>
+          </div>
+          <div class="data">{{user?.personalId}}</div>
+        </div>
       </div>
-    </div>
+    </ng-container>
   `,
   styleUrls: [
     './baby-info-widget.component.scss'
@@ -64,7 +69,12 @@ export class BabyInfoWidgetComponent {
   faChild = faChild;
   faBirthdayCake = faBirthdayCake;
   faIdCard = faIdCard;
-  viewState: 'visible'|'hidden' = 'hidden';
+  viewState: 'visible' | 'hidden' = 'hidden';
+  user$: Observable<Baby>;
+
+  constructor(private babyService: BabyService) {
+    this.user$ = babyService.currentBaby$();
+  }
 
   onChangeChildClicked() {
     console.log('change child!');

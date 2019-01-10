@@ -17,7 +17,7 @@ import {SleepDbMapper} from './sleep-db-mapper';
 })
 export class SleepService {
 
-  private static readonly log = LoggerFactory.getLogger('SleepService');
+  private static readonly log = LoggerFactory.getLogger('BabyService');
   private static readonly DATE_FORMAT = 'YYYY-MM-DD HH:mm';
   private readonly sleepCollection: firebase.firestore.CollectionReference;
 
@@ -37,7 +37,7 @@ export class SleepService {
     this.sleepQuery().limit(1).onSnapshot(
       snapshot => {
         if (snapshot.docs.length > 0) {
-          subject.next(this.sleepDbMapper.fromDocumentSnapshot(snapshot.docs[0]))
+          subject.next(this.sleepDbMapper.fromDocumentSnapshot(snapshot.docs[0]));
         }
       }
     );
@@ -66,8 +66,8 @@ export class SleepService {
     };
     const previous = await this.lastSleep();
     previous
-      .map(previous => previous.data() as SleepDb)
-      .map(previous => this.activityBetween(moment(previous.end.date), date))
+      .map(prev => prev.data() as SleepDb)
+      .map(prev => this.activityBetween(moment(prev.end.date), date))
       .ifPresent(activity => sleep.activityBefore = activity);
     const document = await this.sleepCollection.add(sleep);
     return this.sleepDbMapper.fromDocumentSnapshot(await document.get());
