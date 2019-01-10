@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/mybaby_firebase/mybaby_firebase.iml" filepath="$PROJECT_DIR$/mybaby_firebase/mybaby_firebase.iml" />
       <module fileurl="file://$PROJECT_DIR$/mybaby_mobile/mybaby_mobile.iml" filepath="$PROJECT_DIR$/mybaby_mobile/mybaby_mobile.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mybaby_web/mybaby_web.iml" filepath="$PROJECT_DIR$/mybaby_web/mybaby_web.iml" />
     </modules>
   </component>
 </project>
