@@ -1,4 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
 import {faUtensils} from '@fortawesome/free-solid-svg-icons/faUtensils';
 import {Optional} from '@glipecki/optional';
 import moment from 'moment';
@@ -9,6 +10,7 @@ import {Meal} from 'src/app/nutrition/meal';
 import {NutritionService} from 'src/app/nutrition/nutrition.service';
 import {LoggerFactory} from '../../logger/logger-factory';
 import {UserInteractionService} from '../../user-interaction/user-interaction.service';
+import {WeanService} from '../wean.service';
 
 @Component({
   selector: 'bb-nutrition-dashboard-widget',
@@ -18,6 +20,11 @@ import {UserInteractionService} from '../../user-interaction/user-interaction.se
       <div *ngIf="lastMeal; else lastMealWaiting" class="stats">
         <div>Od ostatniego karmienia: <em>{{sinceLastMeal}}</em></div>
         <div>Ostatnia pierś: <em>{{lastMeal.breastsString}}</em></div>
+      </div>
+      <div *ngIf="weanNextValidFeedTime">
+        <div class="wean-not-yet">
+          Wstrzymaj się z cycuchem do {{weanNextValidFeedTime}}&nbsp;<fa-icon [icon]="weanWaitIcon"></fa-icon>
+        </div>
       </div>
       <div class="actions">
         <ng-container *ngIf="!actionStatus && !adding">
@@ -39,7 +46,7 @@ import {UserInteractionService} from '../../user-interaction/user-interaction.se
         <div class="custom-date-panel">
           <bb-date-time-picker *ngIf="date"
                                [date]="date.date"
-                               [time]="date.time" 
+                               [time]="date.time"
                                (dateChange)="onDateChanged($event)"
                                (timeChange)="onTimeChanged($event)">
           </bb-date-time-picker>
@@ -59,6 +66,7 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
   // noinspection JSUnusedGlobalSymbols - used by template
   Breast = Breast;
   icon = faUtensils;
+  weanWaitIcon = faExclamationTriangle;
   lastMeal: Meal;
   sinceLastMeal: string;
   actionStatus: string;
@@ -68,13 +76,16 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
     date: string,
     time: string
   };
+  weanNextValidFeedTime = '20:15';
   private hoursSinceSubscription: Subscription;
+  private weanSubscription: Subscription;
   private lastMealSubscription: Subscription;
   private readonly userTracker: (interaction: string) => void;
 
   constructor(
     private service: NutritionService,
     private hoursSince: HoursSincePipe,
+    private wean: WeanService,
     userInteractionService: UserInteractionService) {
     this.userTracker = userInteractionService.getTracker('NutritionDashboardWidgetComponent');
   }
@@ -89,7 +100,11 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
     );
     this.hoursSinceSubscription = interval(1000).subscribe(
       () => this.sinceLastMeal = this.lastMeal ? this.hoursSince.transform(this.lastMeal.date) : undefined
-    )
+    );
+    this.wean.nextValidFeedTime().then(time => this.weanNextValidFeedTime = time);
+    this.weanSubscription = interval(1000).subscribe(
+      async () => this.weanNextValidFeedTime = await this.wean.nextValidFeedTime()
+    );
   }
 
   leftBreastClicked() {
@@ -116,6 +131,9 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.hoursSinceSubscription) {
       this.hoursSinceSubscription.unsubscribe();
+    }
+    if (this.weanSubscription) {
+      this.weanSubscription.unsubscribe();
     }
     if (this.lastMealSubscription) {
       this.lastMealSubscription.unsubscribe();

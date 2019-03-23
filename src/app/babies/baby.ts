@@ -1,3 +1,18 @@
+interface BabyWeanScheduleConfig {
+  start: string;
+  step: number;
+  target: number;
+}
+
+interface BabyWeanSchedule {
+  [key: string]: number;
+}
+
+interface BabyWean {
+  scheduleConfig: BabyWeanScheduleConfig;
+  schedule: BabyWeanSchedule;
+}
+
 export interface Baby {
   id: string;
   firstName: string;
@@ -5,4 +20,5 @@ export interface Baby {
   surname: string;
   birthday: string;
   personalId: string;
+  wean: BabyWean;
 }
