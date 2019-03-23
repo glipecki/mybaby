@@ -8,7 +8,8 @@ export interface BabyDb {
     scheduleConfig: {
       start: string,
       step: number,
-      target: number
+      target: number,
+      active: boolean
     },
     schedule: {
       [key: string]: number

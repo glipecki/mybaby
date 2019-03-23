@@ -30,6 +30,9 @@ export class WeanService {
   private suppressFeedUntil(sleep: Sleep, meal: Meal, baby: Baby): string {
     const now = moment();
 
+    if (!baby.wean.scheduleConfig.active) {
+      return undefined;
+    }
     const suppressTime = this.suppressTime(now, baby);
     if (!suppressTime) {
       return undefined;
