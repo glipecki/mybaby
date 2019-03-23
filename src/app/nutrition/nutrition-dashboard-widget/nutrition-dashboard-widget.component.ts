@@ -3,9 +3,9 @@ import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclama
 import {faUtensils} from '@fortawesome/free-solid-svg-icons/faUtensils';
 import {Optional} from '@glipecki/optional';
 import moment from 'moment';
-import {interval, Subscription} from 'rxjs';
+import {interval, Observable, Subscription} from 'rxjs';
 import {HoursSincePipe} from 'src/app/components/hours-since/hours-since.pipe';
-import {Breast} from 'src/app/nutrition/breast'
+import {Breast} from 'src/app/nutrition/breast';
 import {Meal} from 'src/app/nutrition/meal';
 import {NutritionService} from 'src/app/nutrition/nutrition.service';
 import {LoggerFactory} from '../../logger/logger-factory';
@@ -21,9 +21,9 @@ import {WeanService} from '../wean.service';
         <div>Od ostatniego karmienia: <em>{{sinceLastMeal}}</em></div>
         <div>Ostatnia pierś: <em>{{lastMeal.breastsString}}</em></div>
       </div>
-      <div *ngIf="weanNextValidFeedTime">
+      <div *ngIf="suppressFeedUntil$ | async as suppressFeedUntil">
         <div class="wean-not-yet">
-          Wstrzymaj się z cycuchem do {{weanNextValidFeedTime}}&nbsp;<fa-icon [icon]="weanWaitIcon"></fa-icon>
+          Wstrzymaj się z cycuchem do {{suppressFeedUntil}}&nbsp;<fa-icon [icon]="weanWaitIcon"></fa-icon>
         </div>
       </div>
       <div class="actions">
@@ -76,11 +76,10 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
     date: string,
     time: string
   };
-  weanNextValidFeedTime = '20:15';
   private hoursSinceSubscription: Subscription;
-  private weanSubscription: Subscription;
   private lastMealSubscription: Subscription;
   private readonly userTracker: (interaction: string) => void;
+  private suppressFeedUntil$: Observable<string>;
 
   constructor(
     private service: NutritionService,
@@ -101,10 +100,7 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
     this.hoursSinceSubscription = interval(1000).subscribe(
       () => this.sinceLastMeal = this.lastMeal ? this.hoursSince.transform(this.lastMeal.date) : undefined
     );
-    this.wean.nextValidFeedTime().then(time => this.weanNextValidFeedTime = time);
-    this.weanSubscription = interval(1000).subscribe(
-      async () => this.weanNextValidFeedTime = await this.wean.nextValidFeedTime()
-    );
+    this.suppressFeedUntil$ = this.wean.suppressFeedUntil$();
   }
 
   leftBreastClicked() {
@@ -132,9 +128,6 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
     if (this.hoursSinceSubscription) {
       this.hoursSinceSubscription.unsubscribe();
     }
-    if (this.weanSubscription) {
-      this.weanSubscription.unsubscribe();
-    }
     if (this.lastMealSubscription) {
       this.lastMealSubscription.unsubscribe();
     }
@@ -153,7 +146,7 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
     const date = Optional.of(this.date).flatMap(d => `${d.date} ${d.time}`);
     this.service.addMeal(brest, date).subscribe(
       () => {
-        this.flashActionStatus('dodano!', 1000)
+        this.flashActionStatus('dodano!', 1000);
         this.adding = false;
       }
     );

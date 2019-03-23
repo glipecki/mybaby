@@ -25,7 +25,7 @@ export class BabyService {
   }
 
   currentBaby$(): Observable<Baby> {
-    BabyService.log.trace('Request for last sleep');
+    BabyService.log.trace('Request for current baby');
     const subject = new Subject<Baby>();
     (this.babyCollection.doc(this.currentBaby.id())).onSnapshot(
       snapshot => {
