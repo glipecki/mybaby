@@ -16,18 +16,19 @@ export class PoopService {
 
   private static readonly log = LoggerFactory.getLogger('PoopService');
   private static readonly DATE_FORMAT = 'YYYY-MM-DD HH:mm';
-  private poops: firebase.firestore.CollectionReference;
-  private poopsQuery: firebase.firestore.Query;
+  private readonly poops: firebase.firestore.CollectionReference;
+  private readonly poopsQuery: firebase.firestore.Query;
 
   constructor(firebase: FirebaseService, baby: CurrentBabyService, private poopDbMapper: PoopDbMapper) {
     this.poops = firebase.collection(`/babies/${baby.id()}/poops`);
     this.poopsQuery = this.poops.orderBy('date', 'desc');
   }
 
-  poops$(): Observable<Poop[]> {
+  poops$(date?: string): Observable<Poop[]> {
     PoopService.log.trace('Request for all poops');
     const subject = new Subject<Poop[]>();
-    this.poopsQuery.onSnapshot(
+    let query = date ? this.poopsQuery.where('date', '>', date) : this.poopsQuery;
+    query.onSnapshot(
       snapshot => {
         subject.next(snapshot.docs.map(doc => this.poopDbMapper.fromDocumentSnapshot(doc)));
       }

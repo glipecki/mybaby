@@ -44,10 +44,11 @@ export class SleepService {
     return subject.asObservable();
   }
 
-  sleeps$(): Observable<Sleep[]> {
+  sleeps$(date?: string): Observable<Sleep[]> {
     SleepService.log.trace('Request for all sleeps');
     const subject = new Subject<Sleep[]>();
-    this.sleepQuery().onSnapshot(
+    const query = date ? this.sleepQuery().where('start.date', '>', date) : this.sleepQuery();
+    query.onSnapshot(
       snapshot => {
         subject.next(snapshot.docs.map(doc => this.sleepDbMapper.fromDocumentSnapshot(doc)));
       }

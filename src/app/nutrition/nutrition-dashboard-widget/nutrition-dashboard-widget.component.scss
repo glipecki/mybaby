@@ -18,6 +18,10 @@
   .action-status {
     color: $color-success;
   }
+  .custom-date-panel {
+    display: flex;
+    justify-content: center;
+  }
 }
 
 bb-button.recommended {

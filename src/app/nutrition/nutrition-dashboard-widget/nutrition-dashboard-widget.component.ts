@@ -1,5 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {faUtensils} from '@fortawesome/free-solid-svg-icons/faUtensils';
+import {Optional} from '@glipecki/optional';
+import moment from 'moment';
 import {interval, Subscription} from 'rxjs';
 import {HoursSincePipe} from 'src/app/components/hours-since/hours-since.pipe';
 import {Breast} from 'src/app/nutrition/breast'
@@ -11,7 +13,8 @@ import {UserInteractionService} from '../../user-interaction/user-interaction.se
 @Component({
   selector: 'bb-nutrition-dashboard-widget',
   template: `
-    <bb-dashboard-widget [header]="'Karmienie'" [icon]="icon">
+    <bb-dashboard-widget [header]="'Karmienie'" [icon]="icon" [hasExpandableContent]="true"
+                         (expand)="customizeWindowExpanded($event)">
       <div *ngIf="lastMeal; else lastMealWaiting" class="stats">
         <div>Od ostatniego karmienia: <em>{{sinceLastMeal}}</em></div>
         <div>Ostatnia pierś: <em>{{lastMeal.breastsString}}</em></div>
@@ -32,6 +35,16 @@ import {UserInteractionService} from '../../user-interaction/user-interaction.se
           {{actionStatus}}
         </div>
       </div>
+      <ng-container expandable-content>
+        <div class="custom-date-panel">
+          <bb-date-time-picker *ngIf="date"
+                               [date]="date.date"
+                               [time]="date.time" 
+                               (dateChange)="onDateChanged($event)"
+                               (timeChange)="onTimeChanged($event)">
+          </bb-date-time-picker>
+        </div>
+      </ng-container>
     </bb-dashboard-widget>
     <ng-template #lastMealWaiting>
       ...
@@ -41,7 +54,7 @@ import {UserInteractionService} from '../../user-interaction/user-interaction.se
 })
 export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
 
-  private static  readonly log = LoggerFactory.getLogger('NutritionDashboardWidgetComponent');
+  private static readonly log = LoggerFactory.getLogger('NutritionDashboardWidgetComponent');
 
   // noinspection JSUnusedGlobalSymbols - used by template
   Breast = Breast;
@@ -51,6 +64,10 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
   actionStatus: string;
   adding: boolean;
   recommendedBreast: Breast;
+  date: {
+    date: string,
+    time: string
+  };
   private hoursSinceSubscription: Subscription;
   private lastMealSubscription: Subscription;
   private readonly userTracker: (interaction: string) => void;
@@ -76,25 +93,24 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
   }
 
   leftBreastClicked() {
-    this.userTracker( 'User selected left breast meal');
-    this.adding = true;
-    this.service.addMeal(Breast.left).subscribe(
-      () => {
-        this.flashActionStatus('dodano!', 1000)
-        this.adding = false;
-      }
-    );
+    this.userTracker('User selected left breast meal');
+    this.addMeal(Breast.left);
   }
 
   rightBreastClicked() {
-    this.userTracker( 'User selected right breast meal');
-    this.adding = true;
-    this.service.addMeal(Breast.right).subscribe(
-      () => {
-        this.flashActionStatus('dodano!', 1000)
-        this.adding = false;
-      }
-    );
+    this.userTracker('User selected right breast meal');
+    this.addMeal(Breast.right);
+  }
+
+  customizeWindowExpanded(open: boolean) {
+    if (open) {
+      this.date = {
+        date: moment().format('YYYY-MM-DD'),
+        time: moment().format('HH:mm')
+      };
+    } else {
+      this.date = undefined;
+    }
   }
 
   ngOnDestroy(): void {
@@ -104,6 +120,25 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
     if (this.lastMealSubscription) {
       this.lastMealSubscription.unsubscribe();
     }
+  }
+
+  onDateChanged($event: string) {
+    this.date.date = $event;
+  }
+
+  onTimeChanged($event: string) {
+    this.date.time = $event;
+  }
+
+  private addMeal(brest) {
+    this.adding = true;
+    const date = Optional.of(this.date).flatMap(d => `${d.date} ${d.time}`);
+    this.service.addMeal(brest, date).subscribe(
+      () => {
+        this.flashActionStatus('dodano!', 1000)
+        this.adding = false;
+      }
+    );
   }
 
   private flashActionStatus(message: string, timeout: number) {

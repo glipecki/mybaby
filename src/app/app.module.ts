@@ -37,6 +37,7 @@ import {NutritionDashboardWidgetComponent} from './nutrition/nutrition-dashboard
 import {PastNutritionsComponent} from './nutrition/past-nutritions/past-nutritions.component';
 import {PoopWidgetComponent} from './poop/poop-widget/poop-widget.component';
 import {PoopsComponent} from './poop/poops/poops.component';
+import { LoadMoreByWeekComponent } from './components/load-more-by-week/load-more-by-week.component';
 
 @NgModule({
   declarations: [
@@ -71,7 +72,8 @@ import {PoopsComponent} from './poop/poops/poops.component';
     PoopsComponent,
     PoopWidgetComponent,
     TimeSincePipe,
-    LogsComponent
+    LogsComponent,
+    LoadMoreByWeekComponent
   ],
   imports: [
     BrowserModule,

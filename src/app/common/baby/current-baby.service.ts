@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {environment} from '../../../environments/environment';
 import {LoggerFactory} from '../../logger/logger-factory';
 
 @Injectable({
@@ -8,7 +7,7 @@ import {LoggerFactory} from '../../logger/logger-factory';
 export class CurrentBabyService {
 
   private baby = {
-    id: environment.production ? 'oezcGwNonYiNDsYQ6B8g' : 'AvbUw07CTEGqCE4YLeVX'
+    id: 'oezcGwNonYiNDsYQ6B8g'
   };
 
   constructor() {

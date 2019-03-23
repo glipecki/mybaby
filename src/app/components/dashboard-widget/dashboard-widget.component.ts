@@ -1,5 +1,5 @@
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {IconDefinition} from '@fortawesome/fontawesome-common-types'
 import {faEllipsisV} from '@fortawesome/free-solid-svg-icons/faEllipsisV';
 
@@ -47,15 +47,18 @@ export class DashboardWidgetComponent {
   @Input() header: string;
   @Input() icon: IconDefinition;
   @Input() hasExpandableContent = false;
+  @Output() expand = new EventEmitter<boolean>();
   expanded = false;
   faEllipsisV = faEllipsisV;
 
   onExpandedClicked() {
     this.expanded = !this.expanded;
+    this.expand.emit(this.expanded);
   }
 
   hideExpandableContent() {
     this.expanded = false;
+    this.expand.emit(this.expanded);
   }
   
 }

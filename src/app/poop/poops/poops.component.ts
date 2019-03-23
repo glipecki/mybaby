@@ -16,6 +16,7 @@ import {PoopService} from '../poop.service';
         {{row.date}}: {{keys[row.size]}}
       </ng-template>
     </bb-list-with-day-grouping>
+    <button *ngIf="!allLoaded" (click)="loadAll()">kolejne</button>
   `,
   styleUrls: [
     './poops.component.scss'
@@ -26,11 +27,17 @@ export class PoopsComponent implements OnInit {
   readonly keys = PoopSizeKeys;
   poopDateExtractor = (poop: Poop) => moment(poop.date);
   poops$: Observable<Poop[]>;
+  allLoaded = false;
 
   constructor(private service: PoopService) {
   }
 
   ngOnInit() {
+    this.poops$ = this.service.poops$(moment().subtract(7, 'days').format('YYYY-MM-DD'));
+  }
+
+  loadAll() {
+    this.allLoaded = true;
     this.poops$ = this.service.poops$();
   }
 

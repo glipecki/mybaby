@@ -7,6 +7,7 @@ import {flatMap, map} from 'rxjs/operators';
 import {Breast} from 'src/app/nutrition/breast';
 import {BreastDb} from 'src/app/nutrition/breast-db';
 import {AuthService} from '../common/auth/auth.service';
+import {CurrentBabyService} from '../common/baby/current-baby.service';
 import {FirebaseService} from '../firebase/firebase.service';
 import {Meal} from './meal';
 import {MealDb} from './meal-db';
@@ -31,7 +32,7 @@ export class NutritionService {
   private static readonly DATE_FORMAT: string = 'YYYY-MM-DD HH:mm:ss';
   private readonly meals: firebase.firestore.Query;
 
-  constructor(private firebaseService: FirebaseService, private authService: AuthService) {
+  constructor(private firebaseService: FirebaseService, private authService: AuthService, private baby: CurrentBabyService) {
     this.meals = this.firebaseService.app()
       .firestore()
       .collection('meals')
@@ -53,8 +54,7 @@ export class NutritionService {
     return subject.asObservable();
   }
 
-  addMeal(brest: Breast): Observable<Meal> {
-    const date: string = moment().format(NutritionService.DATE_FORMAT);
+  addMeal(brest: Breast, date: string = moment().format(NutritionService.DATE_FORMAT)): Observable<Meal> {
     const mealBreast: BreastDb = {
       breast: brest,
       date: date
@@ -83,7 +83,7 @@ export class NutritionService {
         } else {
           const meal: MealDb = {
             userId: this.authService.getUserWrapper().user.uid,
-            babyId: 'oezcGwNonYiNDsYQ6B8g',
+            babyId: this.baby.id(),
             breasts: [mealBreast],
             date: date
           };
@@ -100,18 +100,19 @@ export class NutritionService {
     );
   }
 
-  private elapsedMinutes(queryResult) {
-    return moment.duration(moment().diff(moment(queryResult.mealDb.date))).asMinutes();
-  }
-
-  getMeals(): Observable<Meal[]> {
+  getMeals(date?: string): Observable<Meal[]> {
     const subject = new Subject<Meal[]>();
-    this.meals.onSnapshot(
+    const query = date ? this.meals.where('date', '>', date) : this.meals;
+    query.onSnapshot(
       snapshot => {
         subject.next(snapshot.docs.map(doc => this.mealDbToMeal(doc.data() as MealDb)));
       }
     );
     return subject.asObservable();
+  }
+
+  private elapsedMinutes(queryResult) {
+    return moment.duration(moment().diff(moment(queryResult.mealDb.date))).asMinutes();
   }
 
   private mealDbToMeal(db: MealDb): Meal {

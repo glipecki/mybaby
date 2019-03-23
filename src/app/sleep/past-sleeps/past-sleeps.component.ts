@@ -51,6 +51,7 @@ import {SleepService} from 'src/app/sleep/sleep.service';
         </div>
       </ng-template>
     </bb-list-with-day-grouping>
+    <button *ngIf="!allLoaded" (click)="loadAll()">kolejne</button>
   `,
   styleUrls: ['./past-sleeps.component.scss']
 })
@@ -60,6 +61,7 @@ export class PastSleepsComponent implements OnInit {
   readonly faBed = faBed;
   // noinspection JSUnusedGlobalSymbols - used by template
   readonly faVolleyballBall = faVolleyballBall;
+  allLoaded = false;
   sleeps$: Observable<Sleep[]>;
   sleepDateExtractor = (sleep: Sleep) => moment(sleep.start);
 
@@ -67,6 +69,11 @@ export class PastSleepsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.sleeps$ = this.sleepService.sleeps$(moment().subtract(7, 'days').format('YYYY-MM-DD'));
+  }
+
+  loadAll() {
+    this.allLoaded = true;
     this.sleeps$ = this.sleepService.sleeps$();
   }
 
