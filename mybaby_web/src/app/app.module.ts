@@ -83,7 +83,8 @@ import {PoopsComponent} from './poop/poops/poops.component';
   providers: [
     HoursSincePipe,
     DaysSincePipe,
-    TimeSincePipe
+    TimeSincePipe,
+    PastSleepsSumSleepPipe
   ],
   bootstrap: [AppComponent]
 })
