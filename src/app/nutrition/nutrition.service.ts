@@ -55,7 +55,7 @@ export class NutritionService {
   }
 
   addMeal(brest: Breast, date?: string): Observable<Meal> {
-    if (!!date) {
+    if (!date) {
       date = moment().format(NutritionService.DATE_FORMAT);
     }
     const mealBreast: BreastDb = {
