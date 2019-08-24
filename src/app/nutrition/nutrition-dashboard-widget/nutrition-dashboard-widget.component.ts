@@ -76,10 +76,10 @@ export class NutritionDashboardWidgetComponent implements OnInit, OnDestroy {
     date: string,
     time: string
   };
+  suppressFeedUntil$: Observable<string>;
   private hoursSinceSubscription: Subscription;
   private lastMealSubscription: Subscription;
   private readonly userTracker: (interaction: string) => void;
-  private suppressFeedUntil$: Observable<string>;
 
   constructor(
     private service: NutritionService,
