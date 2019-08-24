@@ -1,18 +1,4 @@
-interface BabyWeanScheduleConfig {
-  active: boolean;
-  start: string;
-  step: number;
-  target: number;
-}
-
-interface BabyWeanSchedule {
-  [key: string]: number;
-}
-
-interface BabyWean {
-  scheduleConfig: BabyWeanScheduleConfig;
-  schedule: BabyWeanSchedule;
-}
+import {BabyWean} from './baby-wean';
 
 export interface Baby {
   id: string;

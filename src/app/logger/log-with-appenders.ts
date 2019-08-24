@@ -16,7 +16,7 @@ export class LoggerWithAppenders implements Logger {
 
   error(message: string, ...params) {
     if (params.length > 0 && params[params.length - 1] instanceof Error) {
-      const error = params.pop()
+      const error = params.pop();
       this.append(LogLevel.ERROR, message, params, error);
     } else {
       this.append(LogLevel.ERROR, message, params);

@@ -35,6 +35,7 @@ import {LoginComponent} from './host/login/login.component';
 import {PageNotFoundComponent} from './host/page-not-found/page-not-found.component';
 import {NutritionDashboardWidgetComponent} from './nutrition/nutrition-dashboard-widget/nutrition-dashboard-widget.component';
 import {PastNutritionsComponent} from './nutrition/past-nutritions/past-nutritions.component';
+import {WeanScheduleComponent} from './nutrition/wean-schedule/wean-schedule.component';
 import {PoopWidgetComponent} from './poop/poop-widget/poop-widget.component';
 import {PoopsComponent} from './poop/poops/poops.component';
 import { LoadMoreByWeekComponent } from './components/load-more-by-week/load-more-by-week.component';
@@ -71,6 +72,7 @@ import { LoadMoreByWeekComponent } from './components/load-more-by-week/load-mor
     WeekSincePipe,
     PoopsComponent,
     PoopWidgetComponent,
+    WeanScheduleComponent,
     TimeSincePipe,
     LogsComponent,
     LoadMoreByWeekComponent

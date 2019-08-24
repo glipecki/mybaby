@@ -8,6 +8,7 @@ import {DashboardComponent} from './host/dashboard/dashboard.component';
 import {LoginComponent} from './host/login/login.component';
 import {PageNotFoundComponent} from './host/page-not-found/page-not-found.component';
 import {PastNutritionsComponent} from './nutrition/past-nutritions/past-nutritions.component';
+import {WeanScheduleComponent} from './nutrition/wean-schedule/wean-schedule.component';
 import {PoopsComponent} from './poop/poops/poops.component';
 
 const routes: Routes = [
@@ -44,6 +45,10 @@ const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
+  },
+  {
+    path: 'wean',
+    component: WeanScheduleComponent
   },
   {
     path: '**',
