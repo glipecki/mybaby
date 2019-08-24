@@ -35,21 +35,21 @@ export class BottomMenuService {
         icon: faBed,
         routingPath: RoutingPaths.Sleep
       },
-      {
-        iconType: BottomMenuItemIconType.FAS,
-        icon: faPoo,
-        routingPath: RoutingPaths.Poop
-      },
-      {
-        iconType: BottomMenuItemIconType.FAS,
-        icon: faWeight,
-        routingPath: RoutingPaths.Default
-      },
-      {
-        iconType: BottomMenuItemIconType.FAS,
-        icon: faChartPie,
-        routingPath: RoutingPaths.Default
-      }
+      // {
+      //   iconType: BottomMenuItemIconType.FAS,
+      //   icon: faPoo,
+      //   routingPath: RoutingPaths.Poop
+      // },
+      // {
+      //   iconType: BottomMenuItemIconType.FAS,
+      //   icon: faWeight,
+      //   routingPath: RoutingPaths.Default
+      // },
+      // {
+      //   iconType: BottomMenuItemIconType.FAS,
+      //   icon: faChartPie,
+      //   routingPath: RoutingPaths.Default
+      // }
     ]);
   }
 
