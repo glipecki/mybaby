@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Building..."
-yarn build
+yarn ng build --prod --aot --build-optimizer --progress
 echo ""
 
 echo "Deploying..."
